@@ -26,8 +26,7 @@ export default async function AdsBySubcategory({ searchParams }: Props) {
     <div className=" w-full">
       <section className="bg-[#ffffff] pt-8 p-4">
         <div className="max-w-screen-xl mx-auto">
-          <p className="text-gray-500 pb-2"><Link href="/">Home</Link> / <Link href="/">search</Link> / <Link href="/">{query}</Link></p>
-          <h1 className="text-black font-bold text-4xl py-4"> Search results for: "{query}"</h1>
+          <p className="text-gray-500 pb-2"><Link href="/">Home</Link> / <Link href="/">Search</Link></p>
         </div>
       </section>
       <section className="bg-[#ffffff]  pb-16 p-4">
@@ -56,27 +55,24 @@ export default async function AdsBySubcategory({ searchParams }: Props) {
           </div>
           <div className=" lg:w-2/3">
             <div>
-              <h1 className="text-black font-bold text-3xl py-4">Popular "{query}" <span className="ml-2 text-[#2AAEF7]"><Link className="hover:underline" href="/">All</Link></span></h1>
+              <h1 className="text-black font-bold text-3xl py-4">Search results for "{query}"</h1>
               <div className="grid md:grid-cols-3 grid-cols-2 ">
 
               </div>
             </div>
-            <div className="rounded-3xl w-full bg-[#F2F1F0] h-[200px] mt-6 flex justify-center items-center">
-              <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
-            </div>
             <div className="mt-4 py-2 flex items-center cursor-pointer">
                     <svg className="mr-2" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g opacity="0.5">
-                            <path d="M14 10H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M10 14H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M6 18H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M18 6H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M19 10V20M19 20L22 17M19 20L16 17" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 10H2" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M10 14H2" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M6 18H2" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M18 6H2" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M19 10V20M19 20L22 17M19 20L16 17" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </g>
                     </svg>
                     <p className="text-[#333333] mr-2">Sort by</p>
                     <svg width="17" height="10" viewBox="0 0 17 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path opacity="0.5" d="M1.45898 0.708984L8.70888 7.95889L15.9588 0.708984" stroke="#333333" stroke-width="2"/>
+                        <path opacity="0.5" d="M1.45898 0.708984L8.70888 7.95889L15.9588 0.708984" stroke="#333333" strokeWidth="2"/>
                     </svg>
                 </div>
               <div className="mt-4">
@@ -98,9 +94,9 @@ export default async function AdsBySubcategory({ searchParams }: Props) {
             ) : (
             ads.map((ad) => (
                <Link
-  key={ad.id}
-  href={`/${ad.subcategory.category.slug}/${ad.subcategory.slug}/${ad.id}`}
->
+                  key={ad.id}
+                  href={`/${ad.subcategory.category.slug}/${ad.subcategory.slug}/${ad.id}`}
+                >
                 <div className="bg-[#F2F1F0] rounded-2xl p-4 lg:flex mt-3">
                     <div className="lg:w-1/3">
                     <img
@@ -144,7 +140,7 @@ export default async function AdsBySubcategory({ searchParams }: Props) {
                     <div className="max-w-[712px]">
                         <div className="flex items-center border-gray-300 py-3">
                         <img
-                            src={ad.owner?.profile?.avatar}
+                            src={`${ad.owner?.profile?.avatar}`}
                             width={200}
                             height={200}
                             alt=""

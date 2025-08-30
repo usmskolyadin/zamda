@@ -1,7 +1,7 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path, include
 from .views import (
-    CategoryViewSet, ChatViewSet, CurrentUserView, MessageViewSet, RegisterView, ReviewViewSet, SubCategoryViewSet, ExtraFieldDefinitionViewSet, AdvertisementViewSet, UserAdvertisementViewSet, UserProfileViewSet
+    CategoryViewSet, ChatViewSet, CurrentUserView, MessageViewSet, NotificationViewSet, RegisterView, ReviewViewSet, SubCategoryViewSet, ExtraFieldDefinitionViewSet, AdvertisementViewSet, UserAdvertisementViewSet, UserProfileViewSet
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -14,6 +14,7 @@ router.register("chats", ChatViewSet)
 router.register("messages", MessageViewSet)
 router.register(r'profiles', UserProfileViewSet)
 router.register(r'reviews', ReviewViewSet)
+router.register(r'notifications', NotificationViewSet, basename='notification')
 
 urlpatterns = [
     path('', include(router.urls)),

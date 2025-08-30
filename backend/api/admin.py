@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import AdvertisementImage, Category, SubCategory, ExtraFieldDefinition, Advertisement, AdvertisementExtraField, UserProfile
+from .models import AdvertisementImage, Category, Notification, SubCategory, ExtraFieldDefinition, Advertisement, AdvertisementExtraField, UserProfile
 
 admin.site.register(UserProfile)
 
@@ -42,3 +42,9 @@ class AdvertisementAdmin(admin.ModelAdmin):
             return first.image.url
         return "-"
     get_first_image.short_description = "Image"
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ("title", "profile", "is_read", "created_at")
+    list_filter = ("is_read", "created_at")
+    search_fields = ("title", "message")

@@ -20,6 +20,7 @@ export interface Advertisement {
   price: string;
   created_at: string;
   is_active: boolean;
+  location: string;
   images: { id: number; image: string }[];
   owner: {
     username: string;

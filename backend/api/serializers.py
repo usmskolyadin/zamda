@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (
-    AdvertisementImage, Category, Chat, Review, SubCategory,
+    AdvertisementImage, Category, Chat, Notification, Review, SubCategory,
     ExtraFieldDefinition, Advertisement, AdvertisementExtraField, UserProfile, Message
 )
 from django.contrib.auth.models import User
@@ -260,3 +260,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ["id", "title", "message", "is_read", "created_at"]

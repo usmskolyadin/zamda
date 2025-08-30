@@ -1,8 +1,48 @@
+"use client"
 import Link from "next/link";
 import Image from "next/image";
 import { FaArrowRight, FaStar } from "react-icons/fa";
+import { useEffect, useState } from "react";
 
-export default function Ad() {
+interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+export default function Notifications() {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/notifications/", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      const results = Array.isArray(data) ? data : data.results || [];
+      setNotifications(results);
+      setUnread(results.filter((n: Notification) => !n.is_read).length);
+    });
+}, []);
+
+
+  const markAsRead = async (id: number) => {
+    await fetch(`http://127.0.0.1:8000/api/notifications/${id}/mark_as_read/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+    );
+    setUnread((prev) => prev - 1);
+  };
 
   return (
     <div className=" w-full">
@@ -57,27 +97,40 @@ export default function Ad() {
             </div>
           </div>
           <div className=" lg:w-3/4 lg:ml-24">
-            <div className="rounded-3xl w-full bg-[#F2F1F0] h-[200px]  flex justify-center items-center">
-              <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
-            </div>
             <div className="lg:flex">
-                <h1 className="w-2/3 text-black font-bold lg:text-4xl text-3xl lg:py-4 lg:py-1 py-4">Notifications</h1>
+                <h1 className="w-2/3 text-black font-bold lg:text-4xl text-3xl lg:py-4 lg:py-1 py-4">Notifications {unread > 0 && <span className="bg-[#2AAEF7] rounded-full text-white font-semibold">{unread}</span>}</h1>
             </div>
                 <div>
             </div>
             <div className="flex flex-col">
-                    <div className="flex items-center mt-4 min-w-full bg-gray-100 rounded-2xl p-4">
+              {notifications.length === 0 ? (
+                <div className="flex flex-col items-center justify-center mt-2 ">
+                  <img
+                    src="/not_found.png" 
+                    alt="No ads available"
+                    className="w-86 h-86 object-contain"
+                  />
+                <p className="text-black text-3xl font-semibold text-center">
+                    You don't have any notifications
+                  </p>
+                </div>
+              ) : (
+              notifications.map((n) => (
+                    <div
+                      className="flex items-center mt-4 min-w-full bg-gray-100 rounded-2xl p-4"
+                      key={n.id}
+                      onClick={() => markAsRead(n.id)}>
                         <div>
                             <div className="flex items-center justify-between">
-                                <h1 className="text-xl text-black font-bold">Zamda Support</h1>
-                                <h1 className="text-sm text-gray-500">27 Jul</h1>
+                                <h1 className="text-xl text-black font-bold">{n.title}</h1>
+                                <h1 className="text-sm text-gray-500">{new Date(n.created_at).toLocaleString()}</h1>
                             </div>
                             <div className="flex">
-                                <p className="text-md text-gray-600 mr-2">Welcome to our service! Create a new Ad for start. Testing, testing, testing, testing, testing, testing, testing, testing</p>
-                                
+                                <p className="text-md text-gray-600 mr-2">{n.message}</p>
                             </div>
                         </div>
                     </div>
+               )))}
             </div>
           </div>
 

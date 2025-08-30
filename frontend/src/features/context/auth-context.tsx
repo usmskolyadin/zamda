@@ -36,9 +36,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     const userData = localStorage.getItem('user');
+
     if (token && userData) {
-      setAccessToken(token);
-      setUser(JSON.parse(userData) as User);
+      fetch("http://127.0.0.1:8000/api/token/verify/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      })
+        .then((res) => {
+          if (res.ok) {
+            setAccessToken(token);
+            setUser(JSON.parse(userData) as User);
+          } else {
+            handleLogout();
+          }
+        })
+        .catch(() => {
+          handleLogout();
+        });
+    } else {
+      handleLogout();
     }
   }, []);
 
@@ -49,12 +66,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(userData);
   };
 
-  const logout = () => {
+  const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user');
     setAccessToken(null);
     setUser(null);
     router.push('/login');
+  };
+
+  const logout = () => {
+    handleLogout();
   };
 
   return (
