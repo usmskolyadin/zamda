@@ -35,20 +35,17 @@ export default async function AdsBySubcategory({ params }: Props) {
         <div className="max-w-screen-xl lg:flex mx-auto">
           <div className="lg:w-1/3 w-full">
             <div>
-              <h1 className="text-black font-bold text-2xl py-4">Make</h1>
-              <div className="grid md:grid-cols-3 grid-cols-2 ">
-                  <div>
-                      <p className="text-black font-semibold text-xl py-0.5 flex">Vehicles <span className="ml-2 text-[#333333] opacity-60">2900</span></p>
-                      <p className="text-black font-semibold text-xl py-0.5 flex">Vehicles <span className="ml-2 text-[#333333] opacity-60">2900</span></p>
-                      <p className="text-black font-semibold text-xl py-0.5 flex">Vehicles <span className="ml-2 text-[#333333] opacity-60">2900</span></p>
-                      <p className="text-black font-semibold text-xl py-0.5 flex">Vehicles <span className="ml-2 text-[#333333] opacity-60">2900</span></p>
-                  </div>
+              <div className="">
+                <h1 className="text-black font-bold text-xl py-4">Type</h1>
+                <div className="flex">
+                  <input type="text" className="p-3 w-86 rounded-2xl  text-black bg-[#E3E2E1]"  placeholder="From"/>
+                </div>
               </div>
               <div className="">
-                <h1 className="text-black font-bold text-2xl py-4">Price</h1>
+                <h1 className="text-black font-bold text-xl py-4">Price</h1>
                 <div className="flex">
-                  <input type="text" className="p-2 w-36 rounded-2xl mr-2 text-black bg-[#E3E2E1]"  placeholder="From"/>
-                  <input type="text" className="p-2 w-36 rounded-2xl text-black bg-[#E3E2E1]"  placeholder="To"/>
+                  <input type="text" className="p-3 w-43 rounded-2xl mr-2 text-black bg-[#E3E2E1]"  placeholder="From"/>
+                  <input type="text" className="p-3 w-43 rounded-2xl text-black bg-[#E3E2E1]"  placeholder="To"/>
                 </div>
               </div>
               <button className="mt-4 bg-[#2AAEF7] rounded-4xl h-[60px] w-[296px] text-white flex items-center text-center justify-center">
@@ -73,16 +70,16 @@ export default async function AdsBySubcategory({ params }: Props) {
             <div className="mt-4 py-2 flex items-center cursor-pointer">
                     <svg className="mr-2" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g opacity="0.5">
-                            <path d="M14 10H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M10 14H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M6 18H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M18 6H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M19 10V20M19 20L22 17M19 20L16 17" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 10H2" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M10 14H2" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M6 18H2" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M18 6H2" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M19 10V20M19 20L22 17M19 20L16 17" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </g>
                     </svg>
                     <p className="text-[#333333] mr-2">Sort by</p>
                     <svg width="17" height="10" viewBox="0 0 17 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path opacity="0.5" d="M1.45898 0.708984L8.70888 7.95889L15.9588 0.708984" stroke="#333333" stroke-width="2"/>
+                        <path opacity="0.5" d="M1.45898 0.708984L8.70888 7.95889L15.9588 0.708984" stroke="#333333" strokeWidth="2"/>
                     </svg>
                 </div>
               <div className="mt-4">
@@ -104,7 +101,7 @@ export default async function AdsBySubcategory({ params }: Props) {
               ) : (
                 ads.map((ad) => (
 
-                    <div className="bg-[#F2F1F0] rounded-2xl p-4 lg:flex mt-3">
+                    <div key={ad.id} className="bg-[#F2F1F0] rounded-2xl p-4 lg:flex mt-3">
                       <div className="lg:w-1/3">
                         <img
                           src={ad.images[0]?.image || "/placeholder.png"}
@@ -153,7 +150,7 @@ export default async function AdsBySubcategory({ params }: Props) {
                         <div className="max-w-[712px]">
                           <div className="flex items-center border-gray-300 py-3">
                             <img
-                              src={ad.owner?.profile?.avatar}
+                              src={`${ad.owner?.profile?.avatar}`}
                               width={200}
                               height={200}
                               alt=""
@@ -172,12 +169,11 @@ export default async function AdsBySubcategory({ params }: Props) {
                                       ))}
                                       <FaStar className="opacity-50" />
                                     </div>
-                                    <a
-                                      href="#"
+                                    <p
                                       className="text-[#2AAEF7] text-md ml-1 hover:underline"
                                     >
                                       13 reviews
-                                    </a>
+                                    </p>
                                   </div>
                                </Link>
                             </div>

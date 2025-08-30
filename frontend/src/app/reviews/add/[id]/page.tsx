@@ -7,8 +7,8 @@ import { FaStar } from "react-icons/fa";
 import Link from "next/link";
 
 interface Props {
-  profileId: number;       // Кому оставляем отзыв
-  onSuccess: () => void;   // Колбэк после успешной отправки
+  profileId: number;       
+  onSuccess: () => void;
 }
 
 export default function AddReview({ profileId, onSuccess }: Props) {
