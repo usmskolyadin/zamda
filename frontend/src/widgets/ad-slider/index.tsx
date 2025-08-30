@@ -4,19 +4,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
-
-interface Advertisement {
-  id: number;
-  title: string;
-  description: string;
-  price: string;
-  images: { id: number; image: string }[];
-  owner: {
-    username: string;
-    avatar: string;
-    verified: boolean;
-  };
-}
+import { Advertisement } from "@/src/entities/advertisment/model/types";
 
 export default function AdSlider({ ad }: { ad: Advertisement }) {
   const images = ad.images.filter((img) => !!img.image);

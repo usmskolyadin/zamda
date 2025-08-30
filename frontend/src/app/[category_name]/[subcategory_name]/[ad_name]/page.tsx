@@ -1,9 +1,6 @@
 import Link from "next/link";
-import Image from "next/image";
-import { FaArrowRight, FaStar } from "react-icons/fa";
 import { apiFetch } from "@/src/shared/api/base";
 import AdSlider from "@/src/widgets/ad-slider";
-import StartChatButton from "@/src/widgets/start-chat-button";
 import AdActions from "@/src/widgets/ad-actions";
 import { Advertisement } from "@/src/entities/advertisment/model/types";
 
@@ -11,7 +8,7 @@ interface AdProps {
   params: {
     category_name: string;
     subcategory_name: string;
-    ad_name: string; // тут у тебя ID объявления
+    ad_name: string; 
   };
 }
 

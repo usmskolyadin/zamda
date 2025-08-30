@@ -19,6 +19,18 @@ from .serializers import RegisterSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from django.db.models import Q
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, permissions
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Notification
+from .serializers import NotificationSerializer
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet, CharFilter
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all().order_by('name')
@@ -41,7 +53,6 @@ class ExtraFieldDefinitionViewSet(viewsets.ModelViewSet):
     filterset_fields = ['subcategory']
     search_fields = ['name','key']
 
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet, CharFilter
 
 class AdvertisementFilter(FilterSet):
     owner_username = CharFilter(field_name="owner__username", lookup_expr="iexact")
@@ -130,14 +141,6 @@ class CurrentUserView(APIView):
         return Response({"detail": "Profile updated successfully."}, status=status.HTTP_200_OK)
     
 
-from django.db.models import Q
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
-from rest_framework import status
-from django.shortcuts import get_object_or_404
-
 
 class ChatViewSet(viewsets.ModelViewSet):
     queryset = Chat.objects.all()
@@ -157,19 +160,29 @@ class ChatViewSet(viewsets.ModelViewSet):
         if seller == buyer:
             raise ValidationError("Нельзя создать чат с самим собой")
 
-        # Get or create chat
         chat, created = Chat.objects.get_or_create(
             ad=ad,
             buyer=buyer,
             seller=seller
         )
 
-        # Assign the instance to serializer so it returns the chat
         serializer.instance = chat
-        # Only save if it’s a new chat
         if created:
             serializer.save(buyer=buyer, seller=seller)
 
+class NotificationViewSet(viewsets.ModelViewSet):
+    serializer_class = NotificationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(profile=self.request.user.profile)
+
+    @action(detail=True, methods=["post"])
+    def mark_as_read(self, request, pk=None):
+        notification = self.get_object()
+        notification.is_read = True
+        notification.save()
+        return Response({"status": "marked as read"})
 
 
 class MessageViewSet(viewsets.ModelViewSet):

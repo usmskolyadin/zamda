@@ -96,6 +96,18 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username} Profile"
     
+class Notification(models.Model):
+    profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="notifications")
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.title} → {self.profile.user.username}"
 
 class Chat(models.Model):
     ad = models.ForeignKey(
