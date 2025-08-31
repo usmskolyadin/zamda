@@ -1,4 +1,3 @@
-# Stage 1: build
 FROM node:20-bullseye AS builder
 
 WORKDIR /app
@@ -15,6 +14,7 @@ RUN npm install --legacy-peer-deps \
 COPY . .
 
 RUN npm run build
+
 FROM node:20-bullseye AS runner
 
 WORKDIR /app
