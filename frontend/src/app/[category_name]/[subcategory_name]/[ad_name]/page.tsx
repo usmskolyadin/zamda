@@ -4,20 +4,22 @@ import AdSlider from "@/src/widgets/ad-slider";
 import AdActions from "@/src/widgets/ad-actions";
 import { Advertisement } from "@/src/entities/advertisment/model/types";
 
-interface AdProps {
-  params: {
-    category_name: string;
-    subcategory_name: string;
-    ad_name: string; 
-  };
+interface PageParams {
+  category_name: string;
+  subcategory_name: string;
+  ad_name: string;
 }
 
-
-
-export default async function AdPage({ params }: AdProps) {
+export default async function AdPage({
+  params,
+}: {
+  params: PageParams;
+}) {
   const { ad_name } = params;
-  console.log(`${ad_name} PFDSLFSDLDFDSFFD`)
-  const ad: Advertisement = await apiFetch<Advertisement>(`/api/ads/${ad_name}/`);
+
+  const ad: Advertisement = await apiFetch<Advertisement>(
+    `/api/ads/${ad_name}/`
+  );
 
   return (
     <div className=" w-full">
