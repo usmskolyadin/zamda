@@ -12,8 +12,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY package*.json ./
 
-RUN rm -rf node_modules \
-    && npm install --legacy-peer-deps --build-from-source lightningcss
+RUN npm install --legacy-peer-deps
 
 COPY . .
 
