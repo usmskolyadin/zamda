@@ -4,12 +4,8 @@ services:
   backend:
     build: ./backend
     container_name: backend
-    command: gunicorn backend.wsgi:application --bind 0.0.0.0:8000
-    volumes:
-      - ./backend:/app
-    expose:
-      - "8000"
-
+    ports:
+      - "8000:8000"
   frontend:
     build: ./frontend
     container_name: frontend
@@ -19,7 +15,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=/api
+      - NEXT_PUBLIC_API_URL=https://zamda.com/
 
   nginx:
     image: nginx:latest
