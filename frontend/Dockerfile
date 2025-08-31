@@ -5,7 +5,6 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     python3 \
-    libc6-dev \
     git \
     curl \
     && rm -rf /var/lib/apt/lists/*
@@ -17,8 +16,9 @@ RUN npm install --legacy-peer-deps \
 
 COPY . .
 
+RUN npm prune --production
+
 RUN npm run build
 
 EXPOSE 3000
-
 CMD ["npm", "start"]
