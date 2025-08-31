@@ -1,17 +1,9 @@
 import type { Metadata } from "next";
-import { Montserrat, Rubik } from "next/font/google";
 import "./globals.css";
-import Image from "next/image";
-import Link from "next/link";
 import BottomNav from "@/src/widgets/bottom-nav";
-import CategoryDropdown from "../widgets/category-dropdown";
 import Header from "../widgets/header";
 import { AuthProvider } from "../features/context/auth-context";
 import Footer from "../widgets/footer";
-
-const montserrat = Montserrat({
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Zamda",
@@ -25,8 +17,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
-        className={`${montserrat.className} antialiased  bg-white`}
+        className={`antialiased  bg-white`}
       >
         <AuthProvider>
         <Header />
