@@ -2,16 +2,23 @@ FROM node:20-bullseye
 
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y build-essential python3 libc6-dev git curl && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    python3 \
+    libc6-dev \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
-RUN npm install --build-from-source lightningcss
+
+RUN rm -rf node_modules \
+    && npm install --legacy-peer-deps --build-from-source lightningcss
 
 COPY . .
 
 RUN npm run build
+
+EXPOSE 3000
 
 CMD ["npm", "start"]
