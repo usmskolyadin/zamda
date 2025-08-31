@@ -1,10 +1,15 @@
-import Image from "next/image";
 import Tabs from "./Tabs";
 import Link from "next/link";
 import { getCategories } from "@/src/entities/category/api/get-categories";
 
 export default async function Home() {
-  const categories = await getCategories(); 
+  let categories: Awaited<ReturnType<typeof getCategories>> = [];
+  
+  try {
+    const categories = await getCategories(); 
+  } catch(e) {
+    console.warn('Failed to fetch categories', e);
+  }
 
   const bgColors = [
     "bg-[rgba(54,183,50,0.1)]",   
