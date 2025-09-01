@@ -22,7 +22,6 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
-        <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
       </head>
       <body
         className={`antialiased  bg-white`}
