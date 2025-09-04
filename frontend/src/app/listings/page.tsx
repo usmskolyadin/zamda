@@ -70,8 +70,8 @@ export default function Listings() {
                     <Link href="/reviews"><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
                 </div>
                 <div className="py-3 flex flex-col border-b border-gray-300">
-                    <Link aria-disabled href=""><span className="text-[#2AAEF7] text-md h-12">Wallet</span> </Link>
-                    <Link aria-disabled href=""><span className="text-[#2AAEF7] text-md h-12">Paid services</span></Link>
+                    <Link aria-disabled href=""><span className="text-[#2AAEF7] text-md h-12">Wallet (Soon)</span> </Link>
+                    <Link aria-disabled href=""><span className="text-[#2AAEF7] text-md h-12">Paid services (Soon)</span></Link>
                 </div>
                 <div className="py-3 flex flex-col mb-4">
                     <Link href="/profile/edit/"><span className="text-[#2AAEF7] text-md h-12">Profile settings</span> </Link>

@@ -21,8 +21,8 @@ useEffect(() => {
     setLoading(true);
     apiFetch<any>("/api/ads/")
       .then((data) => {
-        console.log("ADS RESPONSE:", data);  // <-- смотри что реально приходит
-        setAds(data.results || data);        // если это пагинация через DRF
+        console.log("ADS RESPONSE:", data);  
+        setAds(data.results || data);        
       })
       .catch((err) => console.error("API error:", err))
       .finally(() => setLoading(false));
@@ -38,14 +38,8 @@ useEffect(() => {
         if (!ads.length) return <p>No ads found.</p>;
         return (
           <div className="grid lg:grid-cols-4 grid-cols-1 gap-4 mt-6">
-            {ads.map((ad) => (
-              <ProductCard
-                key={ad.id}
-                title={ad.title}
-                price={`${ad.price} €`}
-                location={ad.owner.profile?.city || "Unknown"} // если в модели нет поля location
-                image={ad.images.length > 0 ? ad.images[0].image : "/no-image.png"}
-              />
+            {ads.map((ad: Advertisement) => (
+              <ProductCard key={ad.id} ad={ad} />
             ))}
           </div>
         );
