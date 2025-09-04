@@ -147,7 +147,7 @@ export default function NewAd() {
       <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center w-full gap-4">
 
         <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-          <p className="font-semibold">Category</p>
+          <p className="font-semibold text-black text-xl">Category</p>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -165,7 +165,7 @@ export default function NewAd() {
 
         {selectedCategory && (
           <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-            <p className="font-semibold">Subcategory</p>
+            <p className="font-semibold text-black text-xl">Subcategory</p>
             <select
               value={selectedSubcategory}
               onChange={(e) => setSelectedSubcategory(e.target.value)}
@@ -185,19 +185,22 @@ export default function NewAd() {
         {selectedSubcategory && (
           <>
             <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-              <p className="font-semibold">Title</p>
+              <p className="font-semibold text-black text-xl">Title</p>
+              <p className="font-medium text-gray-900">Minimum length 20  symbols</p>
               <input
                 type="text"
                 placeholder="Enter title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                minLength={20}
+                maxLength={100}
                 className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900"
                 required
               />
             </label>
 
             <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-              <p className="font-semibold">Price</p>
+              <p className="font-semibold text-black text-xl">Price ($)</p>
               <input
                 type="number"
                 placeholder="Enter price"
@@ -209,7 +212,8 @@ export default function NewAd() {
             </label>
 
             <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-              <p className="font-semibold">Description</p>
+              <p className="font-semibold text-black text-xl">Description</p>
+              <p className="font-medium text-gray-900">Minimum length 250 symbols</p>
               <textarea
                 placeholder="Enter description"
                 value={description}
@@ -217,12 +221,14 @@ export default function NewAd() {
                 className="p-4 border border-black rounded-3xl mt-1 text-gray-900"
                 rows={4}
                 required
+                minLength={250}
+                maxLength={2000}
               />
             </label>
 
             {extraFields.length > 0 && (
               <div className="lg:w-1/2 flex-col flex mt-4">
-                <h3 className="font-bold">Additional fields</h3>
+                <h3 className="font-bold text-black text-xl">Additional fields</h3>
                 {extraFields.map((field) => (
                   <label
                     key={field.id}
@@ -241,7 +247,7 @@ export default function NewAd() {
             )}
 
             <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-              <p className="font-semibold">Images</p>
+              <p className="font-semibold text-black text-xl">Images</p>
               <input
                 type="file"
                 multiple
