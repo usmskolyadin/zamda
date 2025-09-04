@@ -27,11 +27,11 @@ SECRET_KEY = 'django-insecure-g6=4tsza_e1h&_bztpn6e4df!^1y=6y2z#bhmi%ahi*wxe#ob0
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "*",
+    "*", "https://zamda.com"
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
-# Application definition
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',

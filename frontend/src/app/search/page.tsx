@@ -22,6 +22,12 @@ export default async function AdsBySubcategory({ searchParams }: Props) {
     ads = data.results || [];
   }
 
+  const res = await fetch(`http://127.0.0.1:8000/api/ads/`, {
+    cache: "no-store",
+  });
+  const data = await res.json();
+  ads = data.results || [];
+
   return (
     <div className=" w-full">
       <section className="bg-[#ffffff] pt-8 p-4">
@@ -33,22 +39,27 @@ export default async function AdsBySubcategory({ searchParams }: Props) {
         <div className="max-w-screen-xl lg:flex mx-auto">
           <div className="lg:w-1/3 w-full">
             <div>
-              <h1 className="text-black font-bold text-2xl py-4">Make</h1>
-
+              <h1 className="text-black font-bold text-3xl py-4">Filters</h1>
               <div className="">
-                <h1 className="text-black font-bold text-2xl py-4">Price</h1>
+                <h1 className="text-black font-semibold text-2xl py-4">Category</h1>
                 <div className="flex">
-                  <input type="text" className="p-2 w-36 rounded-2xl mr-2 text-black bg-[#E3E2E1]"  placeholder="From"/>
-                  <input type="text" className="p-2 w-36 rounded-2xl text-black bg-[#E3E2E1]"  placeholder="To"/>
+                  <input type="text" className="p-2.5 lg:w-74 w-full rounded-2xl mr-2 text-black bg-[#E3E2E1]"  placeholder="Choose category"/>
                 </div>
               </div>
-              <button className="mt-4 bg-[#2AAEF7] rounded-4xl h-[60px] w-[296px] text-white flex items-center text-center justify-center">
+              <div className="">
+                <h1 className="text-black font-semibold text-2xl py-4">Price</h1>
+                <div className="flex">
+                  <input type="text" className="p-2.5 lg:w-36 w-1/2 rounded-2xl mr-2 text-black bg-[#E3E2E1]"  placeholder="From"/>
+                  <input type="text" className="p-2.5 lg:w-36 w-1/2 rounded-2xl text-black bg-[#E3E2E1]"  placeholder="To"/>
+                </div>
+              </div>
+              <button className="mt-4 bg-[#2AAEF7] rounded-4xl h-[60px] lg:w-[296px] w-full text-white flex items-center text-center justify-center">
                 <div className="flex items-center">
                   <Link href="/">Show</Link>
                 </div>
               </button>
             
-              <div className="rounded-3xl lg:w-86 w-full  bg-[#F2F1F0] min-h-200 mt-6 flex justify-center items-center">
+              <div className="rounded-3xl lg:w-86 w-full hidden bg-[#F2F1F0] min-h-200 mt-6 flex justify-center items-center">
                 <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
               </div>
             </div>

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { FaStar } from "react-icons/fa";
 import { useAuth } from "@/src/features/context/auth-context";
 
-export default function Listings() {
+export default function Favorites() {
   const { accessToken, user } = useAuth();
 
   return (
@@ -24,7 +24,10 @@ export default function Listings() {
                         className="lg:w-18 w-22 lg:h-18 h-22 rounded-full object-cover border border-gray-500"
                     />
                     <div>
-                    <h2 className="text-black font-bold  lg:text-2xl text-3xl py-2">{user?.first_name} {user?.last_name}</h2>
+                    <div className="py-2">
+                        <h2 className="text-black font-bold  lg:text-2xl text-3xl ">{user?.first_name} {user?.last_name}</h2>
+                        <h2 className="text-gray-800 font-medium  text-md">{user?.username}</h2>
+                    </div>
                     <div className="flex items-center text-sm text-gray-700">
                         <span className="mr-1 text-black text-lg font-bold">4.7</span>
                         <div className="flex text-yellow-400 mr-1">
@@ -43,17 +46,17 @@ export default function Listings() {
             </div>
             <div className="lg:block hidden">
                 <div className="py-3 flex flex-col border-b border-gray-300">
-                    <Link href="listings"><span className="text-[#2AAEF7] text-md h-12">My Listings</span> </Link>
-                    <Link href="favorites"><span className="text-[#2AAEF7] text-md h-12">Favorites</span></Link>
-                    <Link href="messages"><span className="text-[#2AAEF7] text-md h-12">Messages</span></Link>
-                    <Link href="reviews"><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
+                    <Link href="/listings"><span className="text-[#2AAEF7] text-md h-12">My Listings</span> </Link>
+                    <Link href="/favorites"><span className="text-[#2AAEF7] text-md h-12">Favorites</span></Link>
+                    <Link href="/messages"><span className="text-[#2AAEF7] text-md h-12">Messages</span></Link>
+                    <Link href="/reviews"><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
                 </div>
                 <div className="py-3 flex flex-col border-b border-gray-300">
-                    <Link href="listings"><span className="text-[#2AAEF7] text-md h-12">Wallet</span> </Link>
-                    <Link href="favorites"><span className="text-[#2AAEF7] text-md h-12">Paid services</span></Link>
+                    <Link aria-disabled href=""><span className="text-[#2AAEF7] text-md h-12">Wallet (Soon)</span> </Link>
+                    <Link aria-disabled href=""><span className="text-[#2AAEF7] text-md h-12">Paid services (Soon)</span></Link>
                 </div>
                 <div className="py-3 flex flex-col mb-4">
-                    <Link href="listings"><span className="text-[#2AAEF7] text-md h-12">Profile settings</span> </Link>
+                    <Link href="/profile/edit/"><span className="text-[#2AAEF7] text-md h-12">Profile settings</span> </Link>
                 </div>
             </div>
             <div className="rounded-3xl w-full bg-[#F2F1F0] h-[500px] lg:flex hidden  flex justify-center items-center">
@@ -71,11 +74,11 @@ export default function Listings() {
                 <div className="flex items-center cursor-pointer">
                     <svg className="mr-2" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g opacity="0.5">
-                            <path d="M14 10H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M10 14H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M6 18H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M18 6H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M19 10V20M19 20L22 17M19 20L16 17" stroke="#333333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 10H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" strokeLinejoin="round"/>
+                            <path d="M10 14H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" strokeLinejoin="round"/>
+                            <path d="M6 18H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" strokeLinejoin="round"/>
+                            <path d="M18 6H2" stroke="#333333" stroke-width="1.5" stroke-linecap="round" strokeLinejoin="round"/>
+                            <path d="M19 10V20M19 20L22 17M19 20L16 17" stroke="#333333" stroke-width="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </g>
                     </svg>
                     <p className="text-[#333333] mr-2">Sort by</p>

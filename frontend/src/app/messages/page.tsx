@@ -50,8 +50,8 @@ export default function Chats() {
     });
   }, [chats, user?.id]);
 
-  if (!accessToken) return <div className="max-w-screen-xl mx-auto p-4">Авторизуйся, чтобы видеть сообщения.</div>;
-  if (loading) return <div className="max-w-screen-xl mx-auto p-4">Загрузка…</div>;
+  if (!accessToken) return <div className="max-w-screen-xl text-xl font-bold mx-auto p-4 bg-white text-black h-screen">Авторизуйся, чтобы видеть сообщения.</div>;
+  if (loading) return <div className="max-w-screen-xl mx-auto p-4 bg-white text-black h-screen">Загрузка…</div>;
   
   return (
     <div className=" w-full">

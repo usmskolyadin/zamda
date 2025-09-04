@@ -24,3 +24,7 @@ body {
   color: var(--foreground);
   font-family: "Montserrat", sans-serif;
 }
+
+.line-clamp-3 {
+  -webkit-line-clamp: 3;  
+}

@@ -56,13 +56,6 @@ export default async function Home() {
             <h1 className="text-4xl mt-12 font-bold text-black text-center">Recommended for you</h1>
             <Tabs />
           </div>
-
-          <div className="flex justify-center items-center">
-            <button className="bg-black text-white rounded-3xl p-4 h-[50px] w-[188px] flex justify-center items-center">
-              Show more
-            </button>
-          </div>
-
           <div className="rounded-3xl w-full bg-[#F2F1F0] h-[136px] mt-12 flex justify-center items-center">
             <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
           </div>
