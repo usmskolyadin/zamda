@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from .models import Category, Chat, Review, SubCategory, ExtraFieldDefinition, Advertisement, Message, UserProfile
+from .models import AdvertisementLike, Category, Chat, Review, SubCategory, ExtraFieldDefinition, Advertisement, Message, UserProfile
 from .serializers import (
     CategorySerializer, ChatSerializer, MessageSerializer, ProfileSerializer, ReviewSerializer, SubCategorySerializer,
     ExtraFieldDefinitionSerializer, AdvertisementSerializer
@@ -235,3 +235,32 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = UserProfile.objects.prefetch_related('reviews').all()
     serializer_class = ProfileSerializer
+
+
+class AdvertisementViewSet(viewsets.ModelViewSet):
+    queryset = Advertisement.objects.all().select_related("owner").prefetch_related("likes")
+    serializer_class = AdvertisementSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
+
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    def like(self, request, pk=None):
+        ad = self.get_object()
+        user = request.user
+
+        like, created = AdvertisementLike.objects.get_or_create(ad=ad, user=user)
+        if not created: 
+            like.delete()
+            return Response({"detail": "Unliked", "likes_count": ad.likes.count()})
+
+        return Response({"detail": "Liked", "likes_count": ad.likes.count()})
+
+    @action(detail=True, methods=["post"])
+    def view(self, request, pk=None):
+        ad = self.get_object()
+        ad.views_count += 1
+        ad.save(update_fields=["views_count"])
+        return Response({"detail": "View counted", "views_count": ad.views_count})
