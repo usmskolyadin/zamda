@@ -114,7 +114,11 @@ class OwnerSerializer(serializers.ModelSerializer):
         model = User
         fields = ["id", "username", "first_name", "last_name", "email", "profile"]
 
+
 class AdvertisementSerializer(serializers.ModelSerializer):
+    likes_count = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
+
     owner = OwnerSerializer(read_only=True)
     extra_values = serializers.SerializerMethodField(read_only=True)
     images = AdvertisementImageSerializer(many=True, read_only=True)
@@ -125,7 +129,8 @@ class AdvertisementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advertisement
         fields = ('id','owner','subcategory','title','price','description','images',
-                  'created_at','is_active','extra_values','extra', 'owner_profile_id')
+                  'created_at','is_active','extra_values','extra', 'owner_profile_id', "views_count",
+                   "likes_count", "is_liked")
         read_only_fields = ('created_at','owner','extra_values')
 
     def get_extra_values(self, obj):
@@ -135,6 +140,15 @@ class AdvertisementSerializer(serializers.ModelSerializer):
             result[key] = v.value
         return result
 
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+
+    def get_is_liked(self, obj):
+        user = self.context.get("request").user
+        if user.is_authenticated:
+            return obj.likes.filter(id=user.id).exists()
+        return False
+    
     def validate_extra(self, value):
         """
         value expected to be a dict: { 'mileage': 120000, 'year': 2015 }
@@ -264,3 +278,4 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = ["id", "title", "message", "is_read", "created_at"]
+
