@@ -117,8 +117,8 @@ export default function Chats() {
                         <input type="text" placeholder="Search messages" className="bg-[#E3E2E1] w-full p-3 pl-10 text-black rounded-xl"/>
                         <svg width="24" height="24" className="absolute top-3 left-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g opacity="0.5">
-                                <path d="M17 17L21 21" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M3 11C3 15.4183 6.58172 19 11 19C13.213 19 15.2161 18.1015 16.6644 16.6493C18.1077 15.2022 19 13.2053 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11Z" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M17 17L21 21" stroke="#333333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M3 11C3 15.4183 6.58172 19 11 19C13.213 19 15.2161 18.1015 16.6644 16.6493C18.1077 15.2022 19 13.2053 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11Z" stroke="#333333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </g>
                         </svg>
                     </div>
@@ -132,7 +132,7 @@ export default function Chats() {
             </div>
             <div className="flex flex-col">
                         {items.map((c) => (
-          <Link key={c.id} href={`/messages/${c.id}`} className="block ">
+          <Link key={c.id} href={`/messages/${c.id}`} className="block mt-3">
             <div className="flex items-center justify-between bg-gray-100 rounded-2xl p-4 hover:bg-gray-200">
               <div>
                 <div className="text-black font-semibold">{c.ad_title}</div>

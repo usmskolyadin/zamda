@@ -11,7 +11,7 @@ interface AdPageProps {
 }
 
 export default function AdActions({ ad }: AdPageProps) {
-  const { user } = useAuth();
+  const { user, accessToken } = useAuth();
 
   const isOwner = user?.username === ad.owner.username;
 
@@ -19,15 +19,29 @@ export default function AdActions({ ad }: AdPageProps) {
             <div className="flex flex-col mb-6 lg:mt-0 mt-6">
               {isOwner ? (
                 <>
-                  <Link href={`/ads/edit/${ad.id}`} className="w-full p-4 mb-2 bg-[#36B731] text-white rounded-2xl text-center">
+                  <Link href={`/edit/${ad.id}`} className="w-full p-4 mb-2 bg-[#36B731] hover:bg-green-500 transition text-white rounded-2xl text-center">
                     Редактировать
                   </Link>
-                  <button className="w-full p-4 bg-[#2AAEF7] rounded-2xl">Поднять просмотры</button>
+                  <button className="w-full p-4 bg-[#2AAEF7] hover:bg-blue-500 transition rounded-2xl cursor-pointer ">Поднять просмотры (Soon)</button>
                 </>
               ) : (
                 <>
-                  <button className="w-full p-4 bg-[#36B731] rounded-2xl">Show phone</button>
-                  <StartChatButton adId={ad.id} />
+                  {accessToken ? (
+                    <button className="w-full p-4 bg-[#36B731] rounded-2xl cursor-pointer hover:bg-green-500 transition ">Show phone</button>
+                  ) : (
+                    <Link href={"/login"}>
+                      <button className="w-full p-4 bg-[#36B731] rounded-2xl cursor-pointer hover:bg-green-500 transition ">Login for show phone</button>
+                    </Link>
+                  )}
+                  {accessToken ? (<StartChatButton adId={ad.id} />) : (
+                    <Link href={"/login"}>
+                      <button
+                        className="cursor-pointer w-full p-4 bg-[#2AAEF7] hover:bg-blue-500 transition mt-2 rounded-2xl"
+                      >
+                        Login for messages
+                      </button>
+                    </Link>
+                  )}
                 </>
               )}
                   <div className="flex items-center justify-between py-2">
@@ -47,11 +61,11 @@ export default function AdActions({ ad }: AdPageProps) {
                       </div>
                     </Link>
                     <img
-                    src={`${ad.owner.profile?.avatar}`}
-                    width={200}
-                    height={200}
-                    alt="Profile image"
-                    className="w-12 h-12 rounded-full object-cover"
+                      src={`${ad.owner.profile?.avatar}`}
+                      width={200}
+                      height={200}
+                      alt="Profile image"
+                      className="w-12 h-12 rounded-full object-cover"
                     />
                 </div>
                 <div className="text-sm text-gray-600">
@@ -71,7 +85,7 @@ export default function AdActions({ ad }: AdPageProps) {
                     <input
                         type="text"
                         placeholder="Hello!"
-                        className="w-full border rounded-2xl py-3 pl-4 pr-10 text-sm text-gray-800 my-2"
+                        className="w-full border rounded-3xl py-3 pl-4 pr-10 text-sm text-gray-800 my-2"
                     />
                     <FaArrowRight className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer" />
                     </div>
@@ -83,7 +97,7 @@ export default function AdActions({ ad }: AdPageProps) {
                     ].map((text, idx) => (
                         <button
                         key={idx}
-                        className="bg-black text-white rounded-full text-sm px-4 py-3 text-left hover:bg-gray-800 transition"
+                        className="bg-black text-white cursor-pointer rounded-full text-sm px-4 py-3 text-left hover:bg-gray-800 transition"
                         >
                         {text}
                         </button>

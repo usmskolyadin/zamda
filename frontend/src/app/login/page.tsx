@@ -48,7 +48,7 @@ export default function Login() {
       });
 
       const userData = await userRes.json();
-      login(data.access, userData);
+      login(data.access, data.refresh, userData);
       setSuccess('Login successful!');
       setFormData({ email: '', password: '' });
       router.push("/listings")
