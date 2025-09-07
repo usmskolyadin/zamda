@@ -4,12 +4,23 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
   const res = await fetch(`${API_URL}${endpoint}`, {
     headers: {
       "Content-Type": "application/json",
+      ...(options.headers || {}),
     },
     ...options,
   });
 
   if (!res.ok) {
-    throw new Error(`API error: ${res.status}`);
+    let errorMessage: string;
+    try {
+      const errorData = await res.json();
+      errorMessage = JSON.stringify(errorData, null, 2);
+    } catch {
+      errorMessage = await res.text();
+    }
+
+    throw new Error(
+      `API error: ${res.status} ${res.statusText}\nEndpoint: ${endpoint}\nDetails: ${errorMessage}`
+    );
   }
 
   return res.json();

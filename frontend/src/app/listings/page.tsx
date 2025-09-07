@@ -169,19 +169,13 @@ export default function Listings() {
                                         <path d="M1.6001 12.8004C5.7601 4.26706 18.2401 4.26706 22.4001 12.8004" stroke="#333333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                         <path d="M12 17.5992C10.2327 17.5992 8.80005 16.1666 8.80005 14.3992C8.80005 12.6319 10.2327 11.1992 12 11.1992C13.7674 11.1992 15.2 12.6319 15.2 14.3992C15.2 16.1666 13.7674 17.5992 12 17.5992Z" stroke="#333333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                     </svg>
-                                    <p className="text-[#333333] text-md ml-2 mr-4">999</p>
+                                    <p className="text-[#333333] text-md ml-2 mr-4">{ad.views_count}</p>
                                 </div>
                                 <div className="flex">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M22 8.86222C22 10.4087 21.4062 11.8941 20.3458 12.9929C17.9049 15.523 15.5374 18.1613 13.0053 20.5997C12.4249 21.1505 11.5042 21.1304 10.9488 20.5547L3.65376 12.9929C1.44875 10.7072 1.44875 7.01723 3.65376 4.73157C5.88044 2.42345 9.50794 2.42345 11.7346 4.73157L11.9998 5.00642L12.2648 4.73173C13.3324 3.6245 14.7864 3 16.3053 3C17.8242 3 19.2781 3.62444 20.3458 4.73157C21.4063 5.83045 22 7.31577 22 8.86222Z" stroke="#333333" strokeWidth="2" strokeLinejoin="round"/>
                                     </svg>
-                                    <p className="text-[#333333] text-md ml-2 mr-4">999</p>
-                                </div>
-                                <div className="flex">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 13.8214 2.48697 15.5291 3.33782 17L2.5 21.5L7 20.6622C8.47087 21.513 10.1786 22 12 22Z" stroke="#333333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                    <p className="text-[#333333] text-md ml-2 mr-4">999</p>
+                                    <p className="text-[#333333] text-md ml-2 mr-4">{ad.likes_count}</p>
                                 </div>
                             </div>
                         </div>

@@ -4,12 +4,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaSearch, FaHeart, FaPlusCircle, FaCommentDots, FaUser } from "react-icons/fa";
 
+
+const ProfileImg = (profileImgUrl: string) => {
+  return (
+    <img src={profileImgUrl} className="w-12 h-12 rounded-full" alt="" />
+  )
+}
+
 const tabs = [
   { id: "search", label: "Search", icon: <FaSearch />, href: "/search" },
   { id: "favorites", label: "Favorites", icon: <FaHeart />, badge: 2, href: "/favorites" },
   { id: "ads", label: "My Ads", icon: <FaPlusCircle />, highlight: true, href: "/listings" },
   { id: "messages", label: "Messages", icon: <FaCommentDots />, badge: 1, href: "/messages" },
-  { id: "profile", label: "Profile", icon: <FaUser />, href: "/login" },
+  { id: "profile", label: "Profile", icon: <FaUser />, href: "/listings" },
 ];
 
 export default function BottomNav() {

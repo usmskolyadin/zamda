@@ -47,7 +47,7 @@ export default function NewAd() {
   useEffect(() => {
     if (!accessToken) return;
 
-    apiFetchAuth('/api/categories/', accessToken)
+    apiFetchAuth('api/categories/', accessToken)
       .then((data) => {
         if (Array.isArray(data)) {
           setCategories(data);
@@ -66,7 +66,7 @@ export default function NewAd() {
   useEffect(() => {
     if (!selectedCategory || !accessToken) return;
 
-    apiFetchAuth(`/api/subcategories/?category=${selectedCategory}`, accessToken)
+    apiFetchAuth(`api/subcategories/?category=${selectedCategory}`, accessToken)
       .then((data) => {
         if (Array.isArray(data)) {
           setSubcategories(data);
@@ -85,7 +85,7 @@ export default function NewAd() {
   useEffect(() => {
     if (!selectedSubcategory || !accessToken) return;
 
-    apiFetchAuth(`/api/extra-fields/?subcategory=${selectedSubcategory}`, accessToken)
+    apiFetchAuth(`api/extra-fields/?subcategory=${selectedSubcategory}`, accessToken)
       .then((data) => {
         if (Array.isArray(data)) {
           setExtraFields(data);
@@ -270,7 +270,7 @@ export default function NewAd() {
               type="submit"
               className="bg-black text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition"
             >
-              Create Ad
+              Update Ad
             </button>
           </>
         )}
@@ -278,6 +278,5 @@ export default function NewAd() {
     </div>
   </section>
 </div>
-
   );
 }
