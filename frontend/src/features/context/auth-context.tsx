@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_URL } from '@/src/shared/api/base';
 
 interface User {
   id: number;
@@ -18,7 +19,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   accessToken: string | null;
-  login: (token: string, userData: User) => void;
+  login: (token: string, refresh: string, userData: User) => void;
   logout: () => void;
 }
 
@@ -33,46 +34,66 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const router = useRouter(); 
 
-  useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    const userData = localStorage.getItem('user');
 
-    if (token && userData) {
-      fetch("http://127.0.0.1:8000/api/token/verify/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-      })
-        .then((res) => {
-          if (res.ok) {
-            setAccessToken(token);
-            setUser(JSON.parse(userData) as User);
-          } else {
-            handleLogout();
-          }
-        })
-        .catch(() => {
-          handleLogout();
-        });
-    } else {
-      handleLogout();
+  function safeParseUser(data: string | null): User | null {
+    if (!data) return null;
+    try {
+      return JSON.parse(data) as User;
+    } catch {
+      return null;
     }
-  }, []);
+}
 
-  const login = (token: string, userData: User) => {
-    localStorage.setItem('access_token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
+useEffect(() => {
+  const token = localStorage.getItem("access_token");
+  const refresh = localStorage.getItem("refresh_token");
+  const userData = localStorage.getItem("user");
+
+  if (token && userData) {
     setAccessToken(token);
-    setUser(userData);
-  };
+    setUser(safeParseUser(userData));
+  } else if (refresh) {
+    fetch(`${API_URL}api/token/refresh/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.access) {
+          localStorage.setItem("access_token", data.access);
+          setAccessToken(data.access);
+          if (userData) {
+            setUser(safeParseUser(userData));
+          }
+        } else {
+          handleLogout();
+        }
+      })
+      .catch(() => handleLogout());
+  } else {
+    handleLogout();
+  }
+}, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user');
-    setAccessToken(null);
-    setUser(null);
-    router.push('/login');
-  };
+
+const login = (token: string, refresh: string, userData: User) => {
+  localStorage.setItem("access_token", token);
+  localStorage.setItem("refresh_token", refresh);
+  localStorage.setItem("user", JSON.stringify(userData));
+  setAccessToken(token);
+  setUser(userData);
+};
+
+const handleLogout = () => {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+  localStorage.removeItem("user");
+  setAccessToken(null);
+  setUser(null);
+  router.push("/login");
+};
+
 
   const logout = () => {
     handleLogout();

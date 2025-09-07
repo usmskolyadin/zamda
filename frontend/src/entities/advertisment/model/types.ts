@@ -33,6 +33,9 @@ export interface Advertisement {
   };
   subcategory: SubCategory;
   owner_profile_id: number;
+  views_count: number;
+  likes_count: number; 
+  is_liked: boolean;
 }
 
 export interface Review {
