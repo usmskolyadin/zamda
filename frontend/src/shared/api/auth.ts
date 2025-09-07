@@ -2,15 +2,15 @@ import { API_URL } from "./base";
 
 function getTokens() {
   return {
-    access: localStorage.getItem("access"),
-    refresh: localStorage.getItem("refresh"),
+    access: localStorage.getItem("access_token"),
+    refresh: localStorage.getItem("refresh_token"),
   };
 }
 
 function setTokens(access: string, refresh?: string) {
-  localStorage.setItem("access", access);
+  localStorage.setItem("access_token", access);
   if (refresh) {
-    localStorage.setItem("refresh", refresh);
+    localStorage.setItem("refresh_token", refresh);
   }
 }
 
@@ -37,7 +37,7 @@ export async function apiFetchAuth<T>(
 ): Promise<T> {
   let access = token;
 
-  const res = await fetch(`${API_URL}${endpoint}`, {
+  let res = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export async function apiFetchAuth<T>(
       try {
         access = await refreshAccessToken(refresh);
 
-        const retry = await fetch(`${API_URL}${endpoint}`, {
+        res = await fetch(`${API_URL}${endpoint}`, {
           ...options,
           headers: {
             "Content-Type": "application/json",
@@ -62,9 +62,8 @@ export async function apiFetchAuth<T>(
           },
           cache: "no-store",
         });
-        if (!retry.ok) throw new Error(`API ${retry.status}: ${await retry.text()}`);
-        return retry.json();
-      } catch (err) {
+      } catch {
+        localStorage.clear();
         throw new Error("Session expired. Please login again.");
       }
     }

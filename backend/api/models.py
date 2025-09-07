@@ -61,10 +61,32 @@ class Advertisement(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    location = models.CharField(max_length=255)
+
     is_active = models.BooleanField(default=True)
+
+    views_count = models.PositiveIntegerField(default=0)
+    likes = models.ManyToManyField(
+        User,
+        related_name="liked_ads",
+        through="AdvertisementLike",
+        blank=True
+    )
 
     def __str__(self):
         return self.title
+
+
+class AdvertisementLike(models.Model):
+    ad = models.ForeignKey(Advertisement, related_name="ad_likes", on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="user_likes", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("ad", "user")
+
+    def __str__(self):
+        return f"{self.user.username} → {self.ad.title}"
 
 
 class AdvertisementImage(models.Model):

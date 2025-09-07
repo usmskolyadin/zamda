@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FaArrowRight, FaStar } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/src/features/context/auth-context";
 
 interface Notification {
   id: number;
@@ -15,7 +16,11 @@ interface Notification {
 export default function Notifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unread, setUnread] = useState(0);
+  const [activeTab, setActiveTab] = useState("active");
+  const { user } = useAuth();
+  const [adsCount, setAdsCount] = useState(0);
 
+    
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/notifications/", {
     headers: {
@@ -52,15 +57,18 @@ export default function Notifications() {
           <div className="lg:w-1/4">
             <div className="max-w-[712px]">
                   <div className="flex-col items-center justify-between lg:border-b border-gray-300 py-3">
-                    <Image
-                        src="/billie.png"
+                    <img
+                        src={user?.profile.avatar}
                         width={200}
                         height={200}
                         alt="GT Logo"
                         className="lg:w-18 w-22 lg:h-18 h-22 rounded-full object-cover border border-gray-500"
                     />
                     <div>
-                    <h2 className="text-black font-bold  lg:text-2xl text-3xl py-2">General Trucks</h2>
+                    <div className="py-2">
+                        <h2 className="text-black font-bold  lg:text-2xl text-3xl ">{user?.first_name} {user?.last_name}</h2>
+                        <h2 className="text-gray-800 font-medium  text-md">{user?.username}</h2>
+                    </div>
                     <div className="flex items-center text-sm text-gray-700">
                         <span className="mr-1 text-black text-lg font-bold">4.7</span>
                         <div className="flex text-yellow-400 mr-1">
@@ -79,17 +87,17 @@ export default function Notifications() {
             </div>
             <div className="lg:block hidden">
                 <div className="py-3 flex flex-col border-b border-gray-300">
-                    <Link href="listings"><span className="text-[#2AAEF7] text-md h-12">My Listings</span> </Link>
-                    <Link href="favorites"><span className="text-[#2AAEF7] text-md h-12">Favorites</span></Link>
-                    <Link href="messages"><span className="text-[#2AAEF7] text-md h-12">Messages</span></Link>
-                    <Link href="reviews"><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
+                    <Link href="/listings"><span className="text-[#2AAEF7] text-md h-12">My Listings</span> </Link>
+                    <Link href="/favorites"><span className="text-[#2AAEF7] text-md h-12">Favorites</span></Link>
+                    <Link href="/messages"><span className="text-[#2AAEF7] text-md h-12">Messages</span></Link>
+                    <Link href="/reviews"><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
                 </div>
                 <div className="py-3 flex flex-col border-b border-gray-300">
-                    <Link href="listings"><span className="text-[#2AAEF7] text-md h-12">Wallet</span> </Link>
-                    <Link href="favorites"><span className="text-[#2AAEF7] text-md h-12">Paid services</span></Link>
+                    <Link aria-disabled href=""><span className="text-[#2AAEF7] text-md h-12">Wallet (Soon)</span> </Link>
+                    <Link aria-disabled href=""><span className="text-[#2AAEF7] text-md h-12">Paid services (Soon)</span></Link>
                 </div>
                 <div className="py-3 flex flex-col mb-4">
-                    <Link href="listings"><span className="text-[#2AAEF7] text-md h-12">Profile settings</span> </Link>
+                    <Link href="/profile/edit/"><span className="text-[#2AAEF7] text-md h-12">Profile settings</span> </Link>
                 </div>
             </div>
             <div className="rounded-3xl w-full bg-[#F2F1F0] h-[500px] lg:flex hidden  flex justify-center items-center">

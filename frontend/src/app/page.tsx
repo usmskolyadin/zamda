@@ -34,12 +34,12 @@ export default async function Home() {
           <div className="grid md:grid-cols-5 grid-cols-2 lg:gap-14 gap-8">
             {cards.map((card, index) => (
               <Link key={index} href={card.href}>
-                <div className={`${card.bg} lg:w-[200px] w-full lg:h-[175px] h-[140px] rounded-2xl p-4`}>
+                <div className={`${card.bg} lg:w-[200px] w-full lg:h-[175px] h-[170px] rounded-2xl p-4`}>
                   <img
                     src={card.image}
                     width={200}
                     height={300}
-                    className="lg:h-[107px] object-contain"
+                    className="lg:h-[107px] h-[100px] object-contain"
                     alt={card.title}
                   />
                   <h2 className="font-bold text-black lg:text-lg pt-1 truncate">{card.title}</h2>

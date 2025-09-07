@@ -93,9 +93,9 @@ export default function Chat() {
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }), 50);
   };
 
-  if (!accessToken) return <div className="bg-[#ffffff] max-w-screen-xl mx-auto p-4">Авторизуйся, чтобы открыть чат.</div>;
-  if (loading) return <div className="bg-[#ffffff] max-w-screen-xl mx-auto p-4">Загрузка…</div>;
-  if (!chat) return <div className="bg-[#ffffff] max-w-screen-xl mx-auto p-4">Чат не найден.</div>;
+  if (!accessToken) return <div className="bg-[#ffffff]  h-sreen max-w-screen-xl mx-auto p-4">Авторизуйся, чтобы открыть чат.</div>;
+  if (loading) return <div className="bg-[#ffffff]  h-sreen max-w-screen-xl mx-auto p-4">Загрузка…</div>;
+  if (!chat) return <div className="bg-[#ffffff] h-sreen  max-w-screen-xl mx-auto p-4">Чат не найден.</div>;
 
   return (
     <div className=" w-full">
@@ -112,7 +112,7 @@ export default function Chat() {
                         className="lg:w-18 w-22 lg:h-18 h-22 rounded-full object-cover border border-gray-500"
                     />
                     <div>
-                    <h2 className="text-black font-bold  lg:text-2xl text-3xl py-2">{user?.first_name} {user?.last_name}</h2>
+                    <h2 className="text-black font-bold  lg:text-xl text-2xl py-2">{user?.first_name} {user?.last_name}</h2>
                     <div className="flex items-center text-sm text-gray-700">
                         <span className="mr-1 text-black text-lg font-bold">4.7</span>
                         <div className="flex text-yellow-400 mr-1">
@@ -151,18 +151,16 @@ export default function Chat() {
             {/* <div className="rounded-3xl w-full bg-[#F2F1F0] h-[200px]  flex justify-center items-center">
               <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
             </div> */}
-            <div className="lg:flex">
-                <h1 className="w-2/3 text-black font-bold lg:text-4xl text-3xl lg:py-4 lg:py-1 py-4">Messages</h1>
-            </div>
+
 
                 <div>
             </div>
             <div className="flex flex-col">
-                <div className="flex items-center mt-4 min-w-full bg-gray-100  rounded-2xl p-2">
+                <div className="flex items-center mt-4 min-w-full rounded-2xl p-2">
                     <div className="mr-2 flex items-center">
                         <Link href={"/messages"}>
                             <svg className="p-0.5 mr-3 ml-2" width="29" height="28" viewBox="0 0 29 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M13.4207 25.8094L2.00012 14.3888M13.4207 2.96822L2.00012 14.3888M2.00012 14.3888H14.3887H26.7772" stroke="#333333" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M13.4207 25.8094L2.00012 14.3888M13.4207 2.96822L2.00012 14.3888M2.00012 14.3888H14.3887H26.7772" stroke="#333333" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                         </Link>
                         <img
@@ -187,7 +185,7 @@ export default function Chat() {
                             <h1 className="text-sm text-gray-500 ml-2">{chat.ad_title}</h1>
                         </div>
                         <div className="flex">
-                            <span className=" w-8 h-8 p-2 flex items-center justify-center  rounded-full bg-[#D9D9D9]">
+                            <span className=" w-10 h-10 p-2 flex items-center justify-center  rounded-full">
                                 <svg width="24" height="5" viewBox="0 0 24 5" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M19.7226 4.63253C19.477 4.63253 19.2682 4.55884 19.0963 4.41147C18.9489 4.23954 18.8752 4.03077 18.8752 3.78516V1.13253C18.8752 0.886912 18.9489 0.690421 19.0963 0.543052C19.2682 0.371123 19.477 0.285156 19.7226 0.285156H22.3752C22.6209 0.285156 22.8296 0.371123 23.0016 0.543052C23.1735 0.690421 23.2595 0.886912 23.2595 1.13253V3.78516C23.2595 4.03077 23.1735 4.23954 23.0016 4.41147C22.8296 4.55884 22.6209 4.63253 22.3752 4.63253H19.7226Z" fill="black"/>
                                     <path d="M10.4404 4.63253C10.1948 4.63253 9.986 4.55884 9.81407 4.41147C9.6667 4.23954 9.59302 4.03077 9.59302 3.78516V1.13253C9.59302 0.886912 9.6667 0.690421 9.81407 0.543052C9.986 0.371123 10.1948 0.285156 10.4404 0.285156H13.093C13.3386 0.285156 13.5474 0.371123 13.7193 0.543052C13.8913 0.690421 13.9772 0.886912 13.9772 1.13253V3.78516C13.9772 4.03077 13.8913 4.23954 13.7193 4.41147C13.5474 4.55884 13.3386 4.63253 13.093 4.63253H10.4404Z" fill="black"/>
@@ -205,7 +203,7 @@ export default function Chat() {
                     const mine = m.sender === user?.id;
                     return (
                     <div key={m.id} className={`flex mb-2 ${mine ? "justify-end" : "justify-start"}`}>
-                        <div className={`rounded-2xl px-4 py-2 max-w-[75%] ${mine ? "bg-blue-600 text-white" : "bg-gray-100 text-black"}`}>
+                        <div className={`rounded-2xl px-4 py-2 max-w-[75%] ${mine ? "bg-blue-500 text-white" : "bg-gray-100 text-black"}`}>
                         <div className="whitespace-pre-wrap break-words">{m.text}</div>
                         <div className={`text-[10px] mt-1 ${mine ? "text-blue-100" : "text-gray-500"}`}>
                            {new Date(m.created_at).toISOString().slice(0, 16).replace("T", " ")}
@@ -223,9 +221,9 @@ export default function Chat() {
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         placeholder="Write a message…"
-                        className="flex-1 border rounded-2xl py-3 px-4 text-sm text-gray-800"
+                        className="flex-1 border rounded-3xl py-3 px-4 text-sm text-gray-800"
                     />
-                    <button className="rounded-2xl px-5 py-3 bg-black text-white">Send</button>
+                    <button className="rounded-3xl px-5 py-3 bg-black text-white">Send</button>
                 </form>
             </div>
           </div>

@@ -13,7 +13,6 @@ function StartChatButton({ adId }: { adId: number }) {
     const qs = new URLSearchParams({ ad: String(adId) }).toString();
     const response = await apiFetchAuth<any>(`/api/chats/?${qs}`, accessToken);
 
-    // если paginated — берём response.results, иначе сам response
     const chats = Array.isArray(response) ? response : response.results || [];
 
     const existing = chats.find(
@@ -35,7 +34,7 @@ function StartChatButton({ adId }: { adId: number }) {
   return (
     <button
       onClick={startChat}
-      className="w-full p-4 bg-[#2AAEF7] mt-2 rounded-2xl"
+      className="w-full p-4 hover:bg-blue-500 cursor-pointer transition bg-[#2AAEF7] mt-2 rounded-2xl"
     >
       Write message
     </button>
