@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "@/src/features/context/auth-context";
+import { API_URL } from "@/src/shared/api/base";
 import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -27,7 +28,7 @@ export default function Login() {
     setSuccess('');
 
     try {
-      const response = await fetch('http://localhost:8000/api/login/', {
+      const response = await fetch(`${API_URL}api/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -43,7 +44,7 @@ export default function Login() {
         return;
       }
 
-      const userRes = await fetch('http://localhost:8000/api/users/me/', {
+      const userRes = await fetch(`${API_URL}api/users/me/`, {
         headers: { Authorization: `Bearer ${data.access}` },
       });
 
