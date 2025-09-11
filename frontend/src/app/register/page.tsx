@@ -2,6 +2,7 @@
 
 'use client'
 
+import { API_URL } from "@/src/shared/api/base";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -34,10 +35,10 @@ export default function Register() {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/api/register/", {
+      const response = await fetch(`${API_URL}api/register/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData), // уже содержит password2
+        body: JSON.stringify(formData), 
       });
 
       const data = await response.json();
