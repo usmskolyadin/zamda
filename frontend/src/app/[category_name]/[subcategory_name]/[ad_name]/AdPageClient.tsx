@@ -62,15 +62,15 @@ export default function AdPageClient({ ad }: { ad: Advertisement }) {
               <h1 className="text-2xl font-bold text-black mt-2 mb-2">
                 Location
               </h1>
-              <p className="text-black lg:w-2/3">{ad.owner.profile?.city}</p>
+              <p className="text-black lg:w-2/3">{ad.location}</p>
 
               <h1 className="text-2xl font-bold text-black mt-2 mb-2">
                 Description
               </h1>
-              <p className="text-black lg:w-2/3">{ad.description}</p>
+              <p className="text-black lg:w-2/3 break-words overflow-hidden">{ad.description}</p>
 
               <h1 className="text-2xl font-bold text-black mt-6 mb-2">
-                Similar Listings in category {ad.subcategory.category.name}
+                {">"} Similar Listings in category {ad.subcategory.category.name}
               </h1>
               <div className="grid gap-3 lg:grid-cols-2 grid-cols-1 mt-4 lg:mr-36">
                 {ads.map((similarAd: Advertisement) => (

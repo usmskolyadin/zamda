@@ -113,37 +113,60 @@ export default function Listings() {
                       <img
                         src={ad.images[0]?.image}
                         alt={""}
-                        className="rounded-2xl lg:h-48 lg:w-72 w-full object-cover"
+                        className="rounded-2xl lg:h-48 lg:w-72 min-w-72 w-full object-cover"
                       />
                     </div>
                     <div className="w-full lg:mt-0 mt-2">
-                      <h1 className="text-2xl text-black font-bold items-center w-full flex justify-between">{ad.title}
-                        <span className="ml-2 text-gray-600 text-lg font-medium mr-4">
-                       {new Date(ad.created_at).toLocaleString('en-US', {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                })}
+                      <h1 className="text-2xl text-black font-bold items-center w-full flex justify-between break-words leading-snug overflow-hidden">
+                        {ad.title}
+                        <span className="ml-2 text-gray-600 text-lg font-medium mr-4 shrink-0">
+                          {new Date(ad.created_at).toLocaleString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
                         </span>
                       </h1>
-                      <p className="text-lg text-gray-900 font-semibold">
-                        ${ad.price} 
+
+                      <p className="text-lg text-gray-900 font-semibold break-words">
+                        ${ad.price}
                       </p>
-                      <p className="text-md text-gray-600">
-                        {ad.description.length > 200
-                          ? ad.description.slice(0, 200) + "..."
-                          : ad.description}
+
+                      <p
+                        className="text-md text-gray-600 mt-2 line-clamp-3 break-all overflow-hidden"
+                      >
+                        {ad.description}
                       </p>
-                       <p className="font-medium flex text-gray-700 items-center text-lg mt-3">            
-                        <svg className="mr-1" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g opacity="0.5">
-                                <path d="M20 10C20 14.4183 12 22 12 22C12 22 4 14.4183 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10Z" stroke="black" strokeWidth="2"/>
-                                <path d="M12 11C12.5523 11 13 10.5523 13 10C13 9.44772 12.5523 9 12 9C11.4477 9 11 9.44772 11 10C11 10.5523 11.4477 11 12 11Z" fill="black" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </g>
+
+                      <p className="font-medium flex text-gray-700 items-center text-lg mt-3">
+                        <svg
+                          className="mr-1"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g opacity="0.5">
+                            <path
+                              d="M20 10C20 14.4183 12 22 12 22C12 22 4 14.4183 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10Z"
+                              stroke="black"
+                              strokeWidth="2"
+                            />
+                            <path
+                              d="M12 11C12.5523 11 13 10.5523 13 10C13 9.44772 12.5523 9 12 9C11.4477 9 11 9.44772 11 10C11 10.5523 11.4477 11 12 11Z"
+                              fill="black"
+                              stroke="black"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </g>
                         </svg>
-                        {profile.city} 
+                        {profile.city}
                       </p>
                     </div>
+
                   </div>
                 </Link>
               ))}

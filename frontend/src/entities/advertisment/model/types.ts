@@ -23,11 +23,18 @@ export interface Advertisement {
   location: string;
   images: { id: number; image: string }[];
   owner: {
+    id: number;
     username: string;
     first_name: string;
     last_name: string;
     profile: {
-      avatar: string | null;
+      id: number;
+      username: string;
+      first_name: string;
+      last_name: string;
+      avatar: string;
+      rating: number;
+      reviews_count: number;
       city: string;
     } | null;
   };

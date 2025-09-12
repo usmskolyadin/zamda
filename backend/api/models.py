@@ -52,6 +52,17 @@ class ExtraFieldDefinition(models.Model):
     def __str__(self):
         return f"{self.subcategory}: {self.name}"
 
+class AdvertisementView(models.Model):
+    ad = models.ForeignKey("Advertisement", related_name="views", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name="ad_views"
+    )
+    ip_address = models.GenericIPAddressField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("ad", "ip_address") 
 
 class Advertisement(models.Model):
     owner = models.ForeignKey(User, related_name="ads", on_delete=models.CASCADE)

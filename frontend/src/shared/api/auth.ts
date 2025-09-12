@@ -40,7 +40,6 @@ export async function apiFetchAuth<T>(
   let res = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
       ...(options.headers || {}),
       Authorization: `Bearer ${access}`,
     },
@@ -56,7 +55,6 @@ export async function apiFetchAuth<T>(
         res = await fetch(`${API_URL}${endpoint}`, {
           ...options,
           headers: {
-            "Content-Type": "application/json",
             ...(options.headers || {}),
             Authorization: `Bearer ${access}`,
           },

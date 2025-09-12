@@ -90,8 +90,8 @@ class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)
     first_name = serializers.CharField(source="user.first_name", read_only=True)
     last_name = serializers.CharField(source="user.last_name", read_only=True)
-    rating = serializers.FloatField(read_only=True)
-    reviews_count = serializers.IntegerField(read_only=True)
+    rating = serializers.SerializerMethodField()
+    reviews_count = serializers.SerializerMethodField()
 
     class Meta:
         model = UserProfile
@@ -106,6 +106,15 @@ class ProfileSerializer(serializers.ModelSerializer):
             "reviews_count",
             "reviews",
         ]
+
+    def get_rating(self, obj):
+        reviews = obj.reviews.all()
+        if not reviews.exists():
+            return 0
+        return round(sum(r.rating for r in reviews) / reviews.count(), 1)
+
+    def get_reviews_count(self, obj):
+        return obj.reviews.count()
         
 class OwnerSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)
@@ -123,14 +132,19 @@ class AdvertisementSerializer(serializers.ModelSerializer):
     extra_values = serializers.SerializerMethodField(read_only=True)
     images = AdvertisementImageSerializer(many=True, read_only=True)
     extra = serializers.JSONField(write_only=True, required=False)
-    subcategory = SubCategorySerializer()
+    subcategory = SubCategorySerializer(read_only=True)  # вместо PrimaryKeyRelatedField
+    subcategory_id = serializers.PrimaryKeyRelatedField(
+        queryset=SubCategory.objects.all(),
+        write_only=True,
+        source='subcategory'
+    )
     owner_profile_id = serializers.IntegerField(source="owner.profile.id", read_only=True)
 
     class Meta:
         model = Advertisement
-        fields = ('id','owner','subcategory','title','price','description','images',
+        fields = ('id','owner','subcategory','title','price','description','images', 'subcategory_id',
                   'created_at','is_active','extra_values','extra', 'owner_profile_id', "views_count",
-                   "likes_count", "is_liked")
+                   "likes_count", "is_liked", "location")
         read_only_fields = ('created_at','owner','extra_values')
 
     def get_extra_values(self, obj):
@@ -187,33 +201,62 @@ class AdvertisementSerializer(serializers.ModelSerializer):
         return prepared
 
     def create(self, validated_data):
+        import json
+
         extra_dict = validated_data.pop('extra', None)
-        subcategory = validated_data.get('subcategory')
+        if isinstance(extra_dict, str):
+            extra_dict = json.loads(extra_dict)
+
         request = self.context.get('request')
-        files = request.FILES.getlist('images')
         validated_data['owner'] = request.user
 
+        files = request.FILES.getlist('images')
+
+        # здесь subcategory уже объект, не нужно делать SubCategory.objects.get()
         ad = super().create(validated_data)
 
-        prepared = self._validate_and_prepare_extra(subcategory, extra_dict or {})
+        prepared = self._validate_and_prepare_extra(ad.subcategory, extra_dict or {})
         for definition, casted_str in prepared:
-            AdvertisementExtraField.objects.create(ad=ad, field_definition=definition, value=str(casted_str))
-            
+            AdvertisementExtraField.objects.create(
+                ad=ad,
+                field_definition=definition,
+                value=str(casted_str)
+            )
+
         for f in files:
             AdvertisementImage.objects.create(ad=ad, image=f)
+
         return ad
 
-    def update(self, instance, validated_data):
-        extra_dict = validated_data.pop('extra', None)
-        subcategory = validated_data.get('subcategory', instance.subcategory)
 
+
+    def update(self, instance, validated_data):
+        import json
+
+        # Обновляем subcategory если есть
+        subcategory_data = validated_data.pop('subcategory', None)
+        if subcategory_data:
+            if isinstance(subcategory_data, str):
+                subcategory_data = json.loads(subcategory_data)
+            subcategory_id = subcategory_data.get('id') if isinstance(subcategory_data, dict) else subcategory_data
+            validated_data['subcategory'] = SubCategory.objects.get(id=int(subcategory_id))
+
+        # Обновляем объявление
         ad = super().update(instance, validated_data)
 
+        # Обновляем extra поля
+        extra_dict = validated_data.pop('extra', None)
         if extra_dict is not None:
             instance.extra_values.all().delete()
-            prepared = self._validate_and_prepare_extra(subcategory, extra_dict or {})
+            if isinstance(extra_dict, str):
+                extra_dict = json.loads(extra_dict)
+            prepared = self._validate_and_prepare_extra(instance.subcategory, extra_dict or {})
             for definition, casted_str in prepared:
-                AdvertisementExtraField.objects.create(ad=instance, field_definition=definition, value=str(casted_str))
+                AdvertisementExtraField.objects.create(
+                    ad=instance,
+                    field_definition=definition,
+                    value=str(casted_str)
+                )
 
         return ad
 

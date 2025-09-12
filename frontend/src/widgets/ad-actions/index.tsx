@@ -20,9 +20,9 @@ export default function AdActions({ ad }: AdPageProps) {
               {isOwner ? (
                 <>
                   <Link href={`/edit/${ad.id}`} className="w-full p-4 mb-2 bg-[#36B731] hover:bg-green-500 transition text-white rounded-2xl text-center">
-                    Редактировать
+                    Edit
                   </Link>
-                  <button className="w-full p-4 bg-[#2AAEF7] hover:bg-blue-500 transition rounded-2xl cursor-pointer ">Поднять просмотры (Soon)</button>
+                  <button className="w-full p-4 bg-[#2AAEF7] hover:bg-blue-500 transition rounded-2xl cursor-pointer ">Increase views (Soon)</button>
                 </>
               ) : (
                 <>
@@ -45,18 +45,18 @@ export default function AdActions({ ad }: AdPageProps) {
                 </>
               )}
                   <div className="flex items-center justify-between py-2">
-                    <Link href={`/profile/${ad.id}`}>
+                    <Link href={`/profile/${ad.owner.profile.id}`}>
                       <div>
                         <h2 className="text-[#2AAEF7] font-semibold text-lg">{ad.owner.last_name} {ad.owner.first_name}</h2>
                         <div className="flex items-center text-sm text-gray-700">
-                            <span className="mr-1">4.7</span>
+                            <span className="mr-1">{ad.owner.profile?.rating}</span>
                             <div className="flex text-yellow-400 mr-1">
                             {[...Array(4)].map((_, i) => (
                                 <FaStar key={i} />
                             ))}
                             <FaStar className="opacity-50" />
                             </div>
-                            13 reviews
+                            {ad.owner.profile?.reviews_count} reviews
                         </div>
                       </div>
                     </Link>

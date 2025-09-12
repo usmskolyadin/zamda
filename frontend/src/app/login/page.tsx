@@ -28,7 +28,7 @@ export default function Login() {
     setSuccess('');
 
     try {
-      const response = await fetch(`${API_URL}api/login/`, {
+      const response = await fetch(`${API_URL}/api/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -44,7 +44,7 @@ export default function Login() {
         return;
       }
 
-      const userRes = await fetch(`${API_URL}api/users/me/`, {
+      const userRes = await fetch(`${API_URL}/api/users/me/`, {
         headers: { Authorization: `Bearer ${data.access}` },
       });
 
