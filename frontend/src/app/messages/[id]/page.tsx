@@ -92,9 +92,23 @@ export default function Chat() {
     setMessages((prev) => [...prev, created]);
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }), 50);
   };
+  if (!accessToken) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center bg-white">
+        <p className="text-xl text-black">
+          Авторизуйся, чтобы видеть сообщения.
+        </p>
+      </div>
+    );
+  }
 
-  if (!accessToken) return <div className="bg-[#ffffff]  h-sreen max-w-screen-xl mx-auto p-4">Авторизуйся, чтобы открыть чат.</div>;
-  if (loading) return <div className="bg-[#ffffff]  h-sreen max-w-screen-xl mx-auto p-4">Загрузка…</div>;
+  if (loading) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center bg-white">
+        <p className="text-xl text-black">Загрузка…</p>
+      </div>
+    );
+}
   if (!chat) return <div className="bg-[#ffffff] h-sreen  max-w-screen-xl mx-auto p-4">Чат не найден.</div>;
 
   return (

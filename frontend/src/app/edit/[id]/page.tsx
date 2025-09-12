@@ -1,19 +1,12 @@
 'use client';
 
 import { useAuth } from '@/src/features/context/auth-context';
-import { apiFetchAuth } from '@/src/shared/api/auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect, FormEvent } from 'react';
-
-interface Category {
-  id: number;
-  name: string;
-}
-
-interface SubCategory {
-  id: number;
-  name: string;
-}
+import { apiFetchAuth } from '@/src/shared/api/auth';
+import { Advertisement } from '@/src/entities/advertisment/model/types';
+import { apiFetch } from '@/src/shared/api/base';
+import Link from 'next/link';
 
 interface ExtraField {
   id: number;
@@ -22,70 +15,47 @@ interface ExtraField {
   field_type: string;
 }
 
-export default function NewAd() {
+interface AdImage {
+  id: number;
+  image: string; // URL от бэка
+}
+
+export default function EditAd() {
   const { accessToken } = useAuth();
   const router = useRouter();
+  const params = useParams<{ id: string }>();
+  const adId = params?.id;
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
-  const [extraFields, setExtraFields] = useState<ExtraField[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedSubcategory, setSelectedSubcategory] = useState('');
+  const [ad, setAd] = useState<Advertisement | null>(null);
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [isActive, setIsActive] = useState(true);
   const [images, setImages] = useState<FileList | null>(null);
+  const [existingImages, setExistingImages] = useState<AdImage[]>([]);
   const [extraValues, setExtraValues] = useState<{ [key: string]: string }>({});
+  const [extraFields, setExtraFields] = useState<ExtraField[]>([]);
 
   useEffect(() => {
-    if (!accessToken) {
-      router.push('/login');
-    }
-  }, [accessToken, router]);
+    if (!accessToken || !adId) return;
+
+    const fetchAd = async () => {
+      const res = await apiFetchAuth<Advertisement>(`api/ads/${adId}/`, accessToken);
+      setAd(res);
+      setTitle(res.title);
+      setPrice(res.price.toString());
+      setDescription(res.description);
+      setIsActive(res.is_active);
+      setExistingImages(res.images || []); // <- сохраняем список картинок
+    };
+
+    fetchAd();
+  }, [accessToken, adId]);
 
   useEffect(() => {
-    if (!accessToken) return;
+    if (!ad || !accessToken) return;
 
-    apiFetchAuth('api/categories/', accessToken)
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setCategories(data);
-        } else if (Array.isArray((data as any).results)) {
-          setCategories((data as any).results);
-        } else {
-          setCategories([]);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        router.push('/login'); 
-      });
-  }, [accessToken, router]);
-
-  useEffect(() => {
-    if (!selectedCategory || !accessToken) return;
-
-    apiFetchAuth(`api/subcategories/?category=${selectedCategory}`, accessToken)
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setSubcategories(data);
-        } else if (Array.isArray((data as any).results)) {
-          setSubcategories((data as any).results);
-        } else {
-          setSubcategories([]);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        router.push('/login');
-      });
-  }, [selectedCategory, accessToken, router]);
-
-  useEffect(() => {
-    if (!selectedSubcategory || !accessToken) return;
-
-    apiFetchAuth(`api/extra-fields/?subcategory=${selectedSubcategory}`, accessToken)
+    apiFetchAuth(`/api/extra-fields/?subcategory=${ad.subcategory.id}`, accessToken)
       .then((data) => {
         if (Array.isArray(data)) {
           setExtraFields(data);
@@ -95,29 +65,39 @@ export default function NewAd() {
           setExtraFields([]);
         }
       })
-      .catch((err) => {
-        console.error(err);
-        router.push('/login');
-      });
-  }, [selectedSubcategory, accessToken, router]);
+      .catch(console.error);
+  }, [ad, accessToken]);
 
   const handleExtraChange = (key: string, value: string) => {
     setExtraValues((prev) => ({ ...prev, [key]: value }));
   };
 
+  // ✅ Удаление картинки
+  const handleDeleteImage = async (imageId: number) => {
+    if (!accessToken) return;
+    const confirmed = confirm('Удалить это изображение?');
+    if (!confirmed) return;
+
+    const res = await apiFetch(`/api/ad-images/${imageId}/`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    if (res.ok) {
+      setExistingImages((prev) => prev.filter((img) => img.id !== imageId));
+    } else {
+      alert('Ошибка при удалении изображения');
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    if (!accessToken) {
-      router.push('/login');
-      return;
-    }
+    if (!accessToken || !adId) return;
 
     const formData = new FormData();
     formData.append('title', title);
     formData.append('price', price);
     formData.append('description', description);
-    formData.append('subcategory', selectedSubcategory);
     formData.append('is_active', String(isActive));
     formData.append('extra', JSON.stringify(extraValues));
 
@@ -127,76 +107,44 @@ export default function NewAd() {
       });
     }
 
-    const res = await fetch('http://localhost:8000/api/ads/', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+    const res = await apiFetch(`/api/ads/${adId}/`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${accessToken}` },
       body: formData,
     });
 
     if (res.ok) {
-      router.push('/listings');
+      router.push(`/ads/${adId}`);
     } else {
       const data = await res.json();
       console.error(data);
-      alert('Ошибка при создании объявления');
+      alert('Ошибка при обновлении объявления');
     }
   };
 
+  if (!ad) {
+    return <p className="text-center mt-10">Loading ad...</p>;
+  }
+
   return (
-<div className="w-full">
-  <section className="bg-[#ffffff] pt-8 p-4">
-    <div className="max-w-screen-xl mx-auto">
-      <h1 className="text-black text-center font-bold text-4xl py-4">New ad</h1>
-    </div>
-  </section>
+    <div className="w-full">
+      <section className="bg-[#ffffff] pt-8 p-4">
+        <div className="max-w-screen-xl mx-auto">
+          <h1 className="text-black text-center font-bold text-4xl py-4">
+            Edit your Ad <span className='text-[#2AAEF7]'>"<Link href={`/${ad.subcategory.category.id}/${ad.subcategory.id}/${ad.id}`}>{ad.title}</Link>"</span>
+          </h1>
+        </div>
+      </section>
 
-  <section className="bg-[#ffffff] pb-16 p-4 h-screen">
-    <div className="text-black max-w-screen-xl mx-auto">
-      <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center w-full gap-4">
-
-        <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-          <p className="font-semibold text-black text-xl">Category</p>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="p-4 border border-black rounded-3xl h-[55px] mt-1 text-gray-900"
-            required
+      <section className="bg-[#ffffff] pb-16 p-4 h-screen">
+        <div className="text-black max-w-screen-xl mx-auto">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col items-center justify-center w-full gap-4"
           >
-            <option value="">Select category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        {selectedCategory && (
-          <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-            <p className="font-semibold text-black text-xl">Subcategory</p>
-            <select
-              value={selectedSubcategory}
-              onChange={(e) => setSelectedSubcategory(e.target.value)}
-              className="p-4 border border-black rounded-3xl h-[55px] mt-1 text-gray-900"
-              required
-            >
-              <option value="">Select subcategory</option>
-              {subcategories.map((sub) => (
-                <option key={sub.id} value={sub.id}>
-                  {sub.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-
-        {selectedSubcategory && (
-          <>
+            {/* Title */}
             <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
               <p className="font-semibold text-black text-xl">Title</p>
-              <p className="font-medium text-gray-900">Minimum length 20  symbols</p>
               <input
                 type="text"
                 placeholder="Enter title"
@@ -209,6 +157,7 @@ export default function NewAd() {
               />
             </label>
 
+            {/* Price */}
             <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
               <p className="font-semibold text-black text-xl">Price ($)</p>
               <input
@@ -221,9 +170,9 @@ export default function NewAd() {
               />
             </label>
 
+            {/* Description */}
             <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
               <p className="font-semibold text-black text-xl">Description</p>
-              <p className="font-medium text-gray-900">Minimum length 250 symbols</p>
               <textarea
                 placeholder="Enter description"
                 value={description}
@@ -236,9 +185,12 @@ export default function NewAd() {
               />
             </label>
 
+            {/* Extra fields */}
             {extraFields.length > 0 && (
               <div className="lg:w-1/2 flex-col flex mt-4">
-                <h3 className="font-bold text-black text-xl">Additional fields</h3>
+                <h3 className="font-bold text-black text-xl">
+                  Additional fields
+                </h3>
                 {extraFields.map((field) => (
                   <label
                     key={field.id}
@@ -247,8 +199,11 @@ export default function NewAd() {
                     {field.name}
                     <input
                       type="text"
+                      defaultValue={extraValues[field.key] || ''}
                       placeholder={field.name}
-                      onChange={(e) => handleExtraChange(field.key, e.target.value)}
+                      onChange={(e) =>
+                        handleExtraChange(field.key, e.target.value)
+                      }
                       className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900"
                     />
                   </label>
@@ -256,8 +211,31 @@ export default function NewAd() {
               </div>
             )}
 
+            {/* Existing images */}
+            {existingImages.length > 0 && (
+              <div className="lg:w-1/2 flex flex-wrap gap-4 mt-4">
+                {existingImages.map((img) => (
+                  <div key={img.id} className="relative">
+                    <img
+                      src={img.image}
+                      alt="Ad"
+                      className="w-32 h-32 object-cover rounded-xl border"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteImage(img.id)}
+                      className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Upload new images */}
             <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-              <p className="font-semibold text-black text-xl">Images</p>
+              <p className="font-semibold text-black text-xl">Add Images</p>
               <input
                 type="file"
                 multiple
@@ -270,13 +248,11 @@ export default function NewAd() {
               type="submit"
               className="bg-black text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition"
             >
-              Update Ad
+              Save Changes
             </button>
-          </>
-        )}
-      </form>
+          </form>
+        </div>
+      </section>
     </div>
-  </section>
-</div>
   );
 }
