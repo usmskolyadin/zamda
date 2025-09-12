@@ -1,9 +1,10 @@
 from django.forms import ValidationError
 from django.shortcuts import render
+from django.db import IntegrityError
 
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from .models import AdvertisementLike, Category, Chat, Review, SubCategory, ExtraFieldDefinition, Advertisement, Message, UserProfile
+from .models import AdvertisementLike, AdvertisementView, Category, Chat, Review, SubCategory, ExtraFieldDefinition, Advertisement, Message, UserProfile
 from .serializers import (
     CategorySerializer, ChatSerializer, MessageSerializer, ProfileSerializer, ReviewSerializer, SubCategorySerializer,
     ExtraFieldDefinitionSerializer, AdvertisementSerializer
@@ -53,33 +54,69 @@ class ExtraFieldDefinitionViewSet(viewsets.ModelViewSet):
     filterset_fields = ['subcategory']
     search_fields = ['name','key']
 
+import django_filters
 
 class AdvertisementFilter(FilterSet):
-    owner_username = CharFilter(field_name="owner__username", lookup_expr="iexact")
-    owner_email = CharFilter(field_name="owner__email", lookup_expr="iexact")
+    price_min = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
+    price_max = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
+    location = django_filters.CharFilter(field_name="location", lookup_expr="icontains")
+    subcategory = django_filters.ModelChoiceFilter(queryset=SubCategory.objects.all())
+    created_after = django_filters.DateTimeFilter(field_name="created_at", lookup_expr="gte")
+    owner_username = django_filters.CharFilter(field_name="owner__username", lookup_expr="iexact")
+    owner_email = django_filters.CharFilter(field_name="owner__email", lookup_expr="iexact")
 
     class Meta:
         model = Advertisement
-        fields = ['subcategory', 'subcategory__category', 'owner_username', 'owner_email']
-
+        fields = ["subcategory", "location", "price_min", "price_max", "created_after", 'subcategory__category', 'owner_username', 'owner_email']
+        
 class AdvertisementViewSet(viewsets.ModelViewSet):
-    queryset = Advertisement.objects.select_related('owner','subcategory__category') \
-                                    .all().prefetch_related('extra_values__field_definition')
+    queryset = Advertisement.objects.select_related("owner", "subcategory__category") \
+                                    .prefetch_related("extra_values__field_definition", "likes")
     serializer_class = AdvertisementSerializer
     permission_classes = [IsOwnerOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_class = AdvertisementFilter
-    search_fields = ['title','description']
+
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-
+    filterset_class = AdvertisementFilter
     filterset_fields = ["subcategory", "subcategory__category", "owner__username", "owner__profile__city"]
-
     search_fields = ["title", "description", "owner__username", "owner__email"]
     ordering_fields = ["created_at", "price"]
     ordering = ["-created_at"]
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
+
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    def like(self, request, pk=None):
+        ad = self.get_object()
+        user = request.user
+
+        like, created = AdvertisementLike.objects.get_or_create(ad=ad, user=user)
+        if not created:
+            like.delete()
+            return Response({"detail": "Unliked", "likes_count": ad.likes.count()})
+
+        return Response({"detail": "Liked", "likes_count": ad.likes.count()})
+
+
+    @action(detail=True, methods=["post"], permission_classes=[AllowAny])
+    def view(self, request, pk=None):
+        ad = self.get_object()
+
+        ip = request.META.get("REMOTE_ADDR")
+        user = request.user if request.user.is_authenticated else None
+
+        try:
+            AdvertisementView.objects.create(ad=ad, user=user, ip_address=ip)
+            ad.views_count += 1
+            ad.save(update_fields=["views_count"])
+            return Response({"detail": "View counted", "views_count": ad.views_count})
+        except IntegrityError:
+            return Response({"detail": "Already viewed", "views_count": ad.views_count})
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
@@ -237,30 +274,3 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ProfileSerializer
 
 
-class AdvertisementViewSet(viewsets.ModelViewSet):
-    queryset = Advertisement.objects.all().select_related("owner").prefetch_related("likes")
-    serializer_class = AdvertisementSerializer
-
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["request"] = self.request
-        return context
-
-    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
-    def like(self, request, pk=None):
-        ad = self.get_object()
-        user = request.user
-
-        like, created = AdvertisementLike.objects.get_or_create(ad=ad, user=user)
-        if not created: 
-            like.delete()
-            return Response({"detail": "Unliked", "likes_count": ad.likes.count()})
-
-        return Response({"detail": "Liked", "likes_count": ad.likes.count()})
-
-    @action(detail=True, methods=["post"])
-    def view(self, request, pk=None):
-        ad = self.get_object()
-        ad.views_count += 1
-        ad.save(update_fields=["views_count"])
-        return Response({"detail": "View counted", "views_count": ad.views_count})

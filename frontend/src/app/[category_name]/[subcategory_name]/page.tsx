@@ -1,6 +1,7 @@
 import { getAdsBySubcategory } from "@/src/entities/advertisment/api/get-ads";
 import { Advertisement } from "@/src/entities/advertisment/model/types";
 import { getSubCategories } from "@/src/entities/sub-category/api/get-subcategories";
+import Filters from "@/src/widgets/filters";
 import Image from "next/image";
 import Link from "next/link";
 import { FaArrowRight, FaStar } from "react-icons/fa";
@@ -33,32 +34,7 @@ export default async function AdsBySubcategory({ params }: Props) {
       </section>
       <section className="bg-[#ffffff]  pb-16 p-4">
         <div className="max-w-screen-xl lg:flex mx-auto">
-          <div className="lg:w-1/3 w-full">
-            <div>
-              <div className="">
-                <h1 className="text-black font-bold text-xl py-4">Type</h1>
-                <div className="flex">
-                  <input type="text" className="p-3 w-86 rounded-2xl  text-black bg-[#E3E2E1]"  placeholder="From"/>
-                </div>
-              </div>
-              <div className="">
-                <h1 className="text-black font-bold text-xl py-4">Price</h1>
-                <div className="flex">
-                  <input type="text" className="p-3 w-43 rounded-2xl mr-2 text-black bg-[#E3E2E1]"  placeholder="From"/>
-                  <input type="text" className="p-3 w-43 rounded-2xl text-black bg-[#E3E2E1]"  placeholder="To"/>
-                </div>
-              </div>
-              <button className="mt-4 bg-[#2AAEF7] rounded-4xl h-[60px] w-[296px] text-white flex items-center text-center justify-center">
-                <div className="flex items-center">
-                  <Link href="/">Show</Link>
-                </div>
-              </button>
-            
-              <div className="rounded-3xl lg:w-86 w-full  bg-[#F2F1F0] min-h-200 mt-6 flex justify-center items-center">
-                <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
-              </div>
-            </div>
-          </div>
+          <Filters />
           <div className=" lg:w-2/3">
             <div>
               <h1 className="text-black font-bold text-3xl py-4">Popular "{subcategory.name}"</h1>
@@ -143,7 +119,7 @@ export default async function AdsBySubcategory({ params }: Props) {
                           <p className="text-black font-semibold lg:text-lg text-xl">
                             ${ad.price}
                           </p>
-                          <p className="text-gray-600">
+                          <p className="text-gray-600  break-words overflow-hidden line-clamp-3 leading-snug">
                             {ad.description.length > 200
                               ? ad.description.slice(0, 200) + "..."
                               : ad.description}

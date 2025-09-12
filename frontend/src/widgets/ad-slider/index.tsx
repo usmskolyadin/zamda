@@ -59,7 +59,6 @@ export default function AdSlider({ ad }: AdSliderProps) {
                 </svg>
               </div>
             </button>  
-            
           )}
         </div>
 

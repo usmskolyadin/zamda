@@ -4,23 +4,53 @@ import { useAuth } from '@/src/features/context/auth-context';
 import { apiFetchAuth } from '@/src/shared/api/auth';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, FormEvent } from 'react';
+import dynamic from 'next/dynamic';
+import 'leaflet/dist/leaflet.css';
+import L, { LatLngExpression } from 'leaflet';
+import { useMapEvents } from 'react-leaflet';
+import iconUrl from 'leaflet/dist/images/marker-icon.png';
+import iconShadowUrl from 'leaflet/dist/images/marker-shadow.png';
+import { API_URL, apiFetch } from '@/src/shared/api/base';
 
-interface Category {
-  id: number;
-  name: string;
+const defaultIcon = L.icon({
+  iconUrl,
+  shadowUrl: iconShadowUrl,
+  iconAnchor: [12, 41],
+});
+
+interface MapClickProps {
+  onClick: (lat: number, lng: number) => void;
 }
 
-interface SubCategory {
-  id: number;
-  name: string;
+function MapClickHandler({ onClick }: MapClickProps) {
+  useMapEvents({
+    click(e) {
+      onClick(e.latlng.lat, e.latlng.lng);
+    },
+  });
+  return null;
 }
 
-interface ExtraField {
-  id: number;
-  name: string;
-  key: string;
-  field_type: string;
-}
+const MapContainer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.MapContainer),
+  { ssr: false }
+);
+const TileLayer = dynamic(
+  () => import('react-leaflet').then((mod) => mod.TileLayer),
+  { ssr: false }
+);
+const Marker = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Marker),
+  { ssr: false }
+);
+const Popup = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Popup),
+  { ssr: false }
+);
+
+interface Category { id: number; name: string; }
+interface SubCategory { id: number; name: string; }
+interface ExtraField { id: number; name: string; key: string; field_type: string; }
 
 export default function NewAd() {
   const { accessToken } = useAuth();
@@ -29,120 +59,158 @@ export default function NewAd() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
   const [extraFields, setExtraFields] = useState<ExtraField[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedSubcategory, setSelectedSubcategory] = useState('');
-  const [title, setTitle] = useState('');
-  const [price, setPrice] = useState('');
-  const [description, setDescription] = useState('');
-  const [isActive, setIsActive] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
+  const [title, setTitle] = useState<string>('');
+  const [price, setPrice] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [location, setLocation] = useState<string>('');
+  const [latLng, setLatLng] = useState<LatLngExpression>([51.505, -0.09]);
+  const [isActive, setIsActive] = useState<boolean>(true);
   const [images, setImages] = useState<FileList | null>(null);
   const [extraValues, setExtraValues] = useState<{ [key: string]: string }>({});
 
-  useEffect(() => {
-    if (!accessToken) {
+  const [loading, setLoading] = useState(true);
+
+
+useEffect(() => {
+  const token = accessToken || localStorage.getItem('access_token');
+  if (!token) {
+    router.push('/login');
+    return;
+  }
+
+  apiFetchAuth('/api/categories/', token)
+    .then((data) => {
+      if (Array.isArray(data)) setCategories(data);
+      else if (Array.isArray((data as any).results)) setCategories((data as any).results);
+      else setCategories([]);
+    })
+    .catch((err) => {
+      console.error(err);
       router.push('/login');
-    }
-  }, [accessToken, router]);
+    });
+}, [accessToken, router]);
 
-  useEffect(() => {
-    if (!accessToken) return;
+useEffect(() => {
+  const token = accessToken || localStorage.getItem('access_token');
+  if (!token || !selectedCategory) return;
 
-    apiFetchAuth('/api/categories/', accessToken)
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setCategories(data);
-        } else if (Array.isArray((data as any).results)) {
-          setCategories((data as any).results);
-        } else {
-          setCategories([]);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        router.push('/login'); 
-      });
-  }, [accessToken, router]);
-
-  useEffect(() => {
-    if (!selectedCategory || !accessToken) return;
-
-    apiFetchAuth(`/api/subcategories/?category=${selectedCategory}`, accessToken)
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setSubcategories(data);
-        } else if (Array.isArray((data as any).results)) {
-          setSubcategories((data as any).results);
-        } else {
-          setSubcategories([]);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        router.push('/login');
-      });
-  }, [selectedCategory, accessToken, router]);
-
-  useEffect(() => {
-    if (!selectedSubcategory || !accessToken) return;
-
-    apiFetchAuth(`/api/extra-fields/?subcategory=${selectedSubcategory}`, accessToken)
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setExtraFields(data);
-        } else if (Array.isArray((data as any).results)) {
-          setExtraFields((data as any).results);
-        } else {
-          setExtraFields([]);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        router.push('/login');
-      });
-  }, [selectedSubcategory, accessToken, router]);
+  apiFetchAuth(`/api/subcategories/?category=${selectedCategory}`, token)
+    .then((data) => {
+      if (Array.isArray(data)) setSubcategories(data);
+      else if (Array.isArray((data as any).results)) setSubcategories((data as any).results);
+      else setSubcategories([]);
+    })
+    .catch((err) => {
+      console.error(err);
+      router.push('/login');
+    });
+}, [accessToken, selectedCategory, router]);
 
   const handleExtraChange = (key: string, value: string) => {
     setExtraValues((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+const handleMapClick = async (lat: number, lng: number) => {
+  setLatLng([lat, lng]);
 
-    if (!accessToken) {
-      router.push('/login');
-      return;
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,
+      {
+        headers: {
+          'User-Agent': 'my-nextjs-app', // обязательно
+        },
+      }
+    );
+
+    if (!res.ok) return;
+
+    const data: any = await res.json();
+
+    if (data.address) {
+      const { city, town, village, road, house_number } = data.address;
+
+      const cityName = city || town || village || '';
+      const street = road || '';
+      const house = house_number || '';
+
+      const formatted = [cityName, street, house].filter(Boolean).join(', ');
+      setLocation(formatted);
     }
+  } catch (err) {
+    console.error('Geocoding error:', err);
+  }
+};
+const handleLocationChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+  setLocation(value);
 
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('price', price);
-    formData.append('description', description);
-    formData.append('subcategory', selectedSubcategory);
-    formData.append('is_active', String(isActive));
-    formData.append('extra', JSON.stringify(extraValues));
+  if (value.length < 3) return;
 
-    if (images) {
-      Array.from(images).forEach((file) => {
-        formData.append('images', file);
-      });
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value)}&addressdetails=1&limit=5`,
+      {
+        headers: { 'User-Agent': 'my-nextjs-app' },
+      }
+    );
+
+    if (!res.ok) return;
+
+    const data: any[] = await res.json();
+    if (data && data.length > 0) {
+      const { lat, lon, address } = data[0];
+
+      setLatLng([parseFloat(lat), parseFloat(lon)]);
+
+      if (address) {
+        const { city, town, village, road, house_number } = address;
+        const cityName = city || town || village || '';
+        const street = road || '';
+        const house = house_number || '';
+        const formatted = [cityName, street, house].filter(Boolean).join(', ');
+        setLocation(formatted);
+      }
     }
+  } catch (err) {
+    console.error('Geocoding error:', err);
+  }
+};
 
-    const res = await fetch('http://localhost:8000/api/ads/', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: formData,
-    });
 
-    if (res.ok) {
-      router.push('/listings');
-    } else {
-      const data = await res.json();
-      console.error(data);
-      alert('Ошибка при создании объявления');
-    }
-  };
+const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
+  if (!accessToken) { router.push('/login'); return; }
+
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('price', price);
+  formData.append('description', description);
+  formData.append('subcategory_id', selectedSubcategory); 
+  formData.append('is_active', String(isActive));
+  formData.append('extra', JSON.stringify(extraValues));
+  console.log('selectedSubcategory:', selectedSubcategory);
+  console.log('extraValues:', extraValues);
+  if (images) Array.from(images).forEach(file => formData.append('images', file));
+
+  console.log(formData)
+  const res = await fetch(`${API_URL}/api/ads/`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`, // ⚠️ не ставим Content-Type
+    },
+    body: formData,
+  });
+
+  if (res.ok) router.push('/listings');
+  else {
+    const data = await res.json();
+    console.error(data);
+    alert('Ошибка при создании объявления');
+  }
+};
 
   return (
 <div className="w-full">
@@ -152,132 +220,73 @@ export default function NewAd() {
     </div>
   </section>
 
-  <section className="bg-[#ffffff] pb-16 p-4 h-screen">
+  <section className="bg-[#ffffff] pb-16 p-4 h-screen overflow-auto">
     <div className="text-black max-w-screen-xl mx-auto">
       <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center w-full gap-4">
 
         <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
           <p className="font-semibold text-black text-xl">Category</p>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="p-4 border border-black rounded-3xl h-[55px] mt-1 text-gray-900"
-            required
-          >
+          <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="p-4 border border-black rounded-3xl h-[55px] mt-1 text-gray-900" required>
             <option value="">Select category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
+            {categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
           </select>
         </label>
 
         {selectedCategory && (
           <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
             <p className="font-semibold text-black text-xl">Subcategory</p>
-            <select
-              value={selectedSubcategory}
-              onChange={(e) => setSelectedSubcategory(e.target.value)}
-              className="p-4 border border-black rounded-3xl h-[55px] mt-1 text-gray-900"
-              required
-            >
+            <select value={selectedSubcategory} onChange={(e) => setSelectedSubcategory(e.target.value)} className="p-4 border border-black rounded-3xl h-[55px] mt-1 text-gray-900" required>
               <option value="">Select subcategory</option>
-              {subcategories.map((sub) => (
-                <option key={sub.id} value={sub.id}>
-                  {sub.name}
-                </option>
-              ))}
+              {subcategories.map((sub) => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
             </select>
           </label>
         )}
 
-        {selectedSubcategory && (
-          <>
-            <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-              <p className="font-semibold text-black text-xl">Title</p>
-              <p className="font-medium text-gray-900">Minimum length 20  symbols</p>
-              <input
-                type="text"
-                placeholder="Enter title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                minLength={20}
-                maxLength={100}
-                className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900"
-                required
-              />
-            </label>
+        {selectedSubcategory && <>
+          <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
+            <p className="font-semibold text-black text-xl">Title</p>
+            <p className="font-medium text-gray-900">Minimum length 20 symbols</p>
+            <input type="text" placeholder="Enter title" value={title} onChange={(e) => setTitle(e.target.value)} minLength={20} maxLength={100} className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900" required />
+          </label>
 
-            <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-              <p className="font-semibold text-black text-xl">Price ($)</p>
-              <input
-                type="number"
-                placeholder="Enter price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900"
-                required
-              />
-            </label>
+          <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
+            <p className="font-semibold text-black text-xl">Price ($)</p>
+            <input type="number" placeholder="Enter price" value={price} onChange={(e) => setPrice(e.target.value)} className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900" required />
+          </label>
 
-            <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-              <p className="font-semibold text-black text-xl">Description</p>
-              <p className="font-medium text-gray-900">Minimum length 250 symbols</p>
-              <textarea
-                placeholder="Enter description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="p-4 border border-black rounded-3xl mt-1 text-gray-900"
-                rows={4}
-                required
-                minLength={250}
-                maxLength={2000}
-              />
-            </label>
+          <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
+            <p className="font-semibold text-black text-xl">Description</p>
+            <p className="font-medium text-gray-900">Minimum length 250 symbols</p>
+            <textarea placeholder="Enter description" value={description} onChange={(e) => setDescription(e.target.value)} className="p-4 border border-black rounded-3xl mt-1 text-gray-900" rows={4} required minLength={250} maxLength={2000} />
+          </label>
 
-            {extraFields.length > 0 && (
-              <div className="lg:w-1/2 flex-col flex mt-4">
-                <h3 className="font-bold text-black text-xl">Additional fields</h3>
-                {extraFields.map((field) => (
-                  <label
-                    key={field.id}
-                    className="font-semibold text-gray-800 mt-2 block"
-                  >
-                    {field.name}
-                    <input
-                      type="text"
-                      placeholder={field.name}
-                      onChange={(e) => handleExtraChange(field.key, e.target.value)}
-                      className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900"
-                    />
-                  </label>
-                ))}
-              </div>
-            )}
+          <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
+            <p className="font-semibold text-black text-xl">Location</p>
+            <input type="text" placeholder="Enter location or select on map" value={location} onChange={handleLocationChange} className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900 mb-2" required />
+          </label>
 
-            <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-              <p className="font-semibold text-black text-xl">Images</p>
-              <input
-                type="file"
-                multiple
-                onChange={(e) => setImages(e.target.files)}
-                className="p-4 border border-black rounded-3xl mt-1 text-gray-900"
-              />
-            </label>
+          <div className="lg:w-1/2 h-80 border border-black rounded-3xl overflow-hidden">
+<MapContainer center={latLng} zoom={13} style={{ height: '100%', width: '100%' }}>
+  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+  <Marker position={latLng} icon={defaultIcon}>
+    <Popup>Selected location</Popup>
+  </Marker>
+  <MapClickHandler onClick={handleMapClick} />
+</MapContainer>
+          </div>
 
-            <button
-              type="submit"
-              className="bg-black text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition"
-            >
-              Create Ad
-            </button>
-          </>
-        )}
+          <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
+            <p className="font-semibold text-black text-xl">Images</p>
+            <input type="file" multiple onChange={(e) => setImages(e.target.files)} className="p-4 border border-black rounded-3xl mt-1 text-gray-900" />
+          </label>
+
+          <button type="submit" className="bg-black text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition">
+            Create Ad
+          </button>
+        </>}
       </form>
     </div>
   </section>
 </div>
-
   );
 }

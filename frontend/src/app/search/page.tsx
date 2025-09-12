@@ -1,32 +1,35 @@
-import { getAdsBySubcategory } from "@/src/entities/advertisment/api/get-ads";
 import { Advertisement } from "@/src/entities/advertisment/model/types";
-import { getSubCategories } from "@/src/entities/sub-category/api/get-subcategories";
-import Image from "next/image";
+import { API_URL } from "@/src/shared/api/base";
+import Filters from "@/src/widgets/filters";
 import Link from "next/link";
-import { FaArrowRight, FaStar } from "react-icons/fa";
-
+import { FaStar } from "react-icons/fa";
 
 interface Props {
-  searchParams: { query?: string };
+  searchParams: {
+    query?: string;
+    subcategory?: string;
+    price_min?: string;
+    price_max?: string;
+    location?: string;
+    created_after?: string;
+  };
 }
 
-export default async function AdsBySubcategory({ searchParams }: Props) {
-  const query = searchParams.query || "";
-  let ads: Advertisement[] = [];
+export default async function SearchPage({ searchParams }: Props) {
+  const params = new URLSearchParams();
 
-  if (query) {
-    const res = await fetch(`http://127.0.0.1:8000/api/ads/?search=${query}`, {
-      cache: "no-store",
-    });
-    const data = await res.json();
-    ads = data.results || [];
-  }
+  if (searchParams.query) params.append("search", searchParams.query);
+  if (searchParams.subcategory) params.append("subcategory", searchParams.subcategory);
+  if (searchParams.price_min) params.append("price_min", searchParams.price_min);
+  if (searchParams.price_max) params.append("price_max", searchParams.price_max);
+  if (searchParams.location) params.append("location", searchParams.location);
+  if (searchParams.created_after) params.append("created_after", searchParams.created_after);
 
-  const res = await fetch(`http://127.0.0.1:8000/api/ads/`, {
+  const res = await fetch(`${API_URL}/api/ads/?${params.toString()}`, {
     cache: "no-store",
   });
   const data = await res.json();
-  ads = data.results || [];
+  const ads: Advertisement[] = data.results || [];
 
   return (
     <div className=" w-full">
@@ -37,36 +40,10 @@ export default async function AdsBySubcategory({ searchParams }: Props) {
       </section>
       <section className="bg-[#ffffff]  pb-16 p-4">
         <div className="max-w-screen-xl lg:flex mx-auto">
-          <div className="lg:w-1/3 w-full">
-            <div>
-              <h1 className="text-black font-bold text-3xl py-4">Filters</h1>
-              <div className="">
-                <h1 className="text-black font-semibold text-2xl py-4">Category</h1>
-                <div className="flex">
-                  <input type="text" className="p-2.5 lg:w-74 w-full rounded-2xl mr-2 text-black bg-[#E3E2E1]"  placeholder="Choose category"/>
-                </div>
-              </div>
-              <div className="">
-                <h1 className="text-black font-semibold text-2xl py-4">Price</h1>
-                <div className="flex">
-                  <input type="text" className="p-2.5 lg:w-36 w-1/2 rounded-2xl mr-2 text-black bg-[#E3E2E1]"  placeholder="From"/>
-                  <input type="text" className="p-2.5 lg:w-36 w-1/2 rounded-2xl text-black bg-[#E3E2E1]"  placeholder="To"/>
-                </div>
-              </div>
-              <button className="mt-4 bg-[#2AAEF7] rounded-4xl h-[60px] lg:w-[296px] w-full text-white flex items-center text-center justify-center">
-                <div className="flex items-center">
-                  <Link href="/">Show</Link>
-                </div>
-              </button>
-            
-              <div className="rounded-3xl lg:w-86 w-full hidden bg-[#F2F1F0] min-h-200 mt-6 flex justify-center items-center">
-                <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
-              </div>
-            </div>
-          </div>
+          <Filters />
           <div className=" lg:w-2/3">
             <div>
-              <h1 className="text-black font-bold text-3xl py-4">Search results for "{query}"</h1>
+              <h1 className="text-black font-bold text-3xl py-4">Search results for "{searchParams.query}"</h1>
               <div className="grid md:grid-cols-3 grid-cols-2 ">
 
               </div>
@@ -139,7 +116,7 @@ export default async function AdsBySubcategory({ searchParams }: Props) {
                         <p className="text-black font-semibold lg:text-lg text-xl">
                         ${ad.price}
                         </p>
-                        <p className="text-gray-600">
+                        <p className="text-gray-600  break-words overflow-hidden line-clamp-3 leading-snug">
                         {ad.description.length > 200
                             ? ad.description.slice(0, 200) + "..."
                             : ad.description}
