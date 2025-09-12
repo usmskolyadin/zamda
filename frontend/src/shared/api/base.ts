@@ -1,7 +1,14 @@
-export const API_URL = 'https://zamda.com';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+
+function buildUrl(endpoint: string): string {
+  const base = API_URL.replace(/\/+$/, "");
+  const path = endpoint.replace(/^\/+/, "");
+  return `${base}/${path}`;
+}
 
 export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${API_URL}${endpoint}`, {
+  const url = buildUrl(endpoint);
+  const res = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
       ...(options.headers || {}),

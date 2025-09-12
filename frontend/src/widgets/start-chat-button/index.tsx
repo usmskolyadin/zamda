@@ -23,6 +23,9 @@ function StartChatButton({ adId }: { adId: number }) {
     if (!chatId) {
       const created = await apiFetchAuth<any>("/api/chats/", accessToken, {
         method: "POST",
+          headers: {
+              "Content-Type": "application/json",   // <--- ОБЯЗАТЕЛЬНО
+          },
         body: JSON.stringify({ ad: adId }),
       });
       chatId = created.id;

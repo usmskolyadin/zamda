@@ -50,9 +50,24 @@ export default function Chats() {
     });
   }, [chats, user?.id]);
 
-  if (!accessToken) return <div className="max-w-screen-xl text-xl font-bold mx-auto p-4 bg-white text-black h-screen">Авторизуйся, чтобы видеть сообщения.</div>;
-  if (loading) return <div className="max-w-screen-xl mx-auto p-4 bg-white text-black h-screen">Загрузка…</div>;
-  
+if (!accessToken) {
+  return (
+    <div className="w-screen h-screen flex items-center justify-center bg-white">
+      <p className="text-xl text-black">
+        Авторизуйся, чтобы видеть сообщения.
+      </p>
+    </div>
+  );
+}
+
+if (loading) {
+  return (
+    <div className="w-screen h-screen flex items-center justify-center bg-white">
+      <p className="text-xl text-black">Загрузка…</p>
+    </div>
+  );
+}
+
   return (
     <div className=" w-full">
       <section className="bg-[#ffffff]  pb-16 p-4">
