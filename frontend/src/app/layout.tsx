@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import BottomNav from "@/src/widgets/bottom-nav";
-import Header from "../widgets/header";
-import { AuthProvider } from "../features/context/auth-context";
-import Footer from "../widgets/footer";
+import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {
   title: "Zamda — Buy & Sell Locally in the USA",
@@ -17,9 +14,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <head>
@@ -27,21 +24,10 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
-        
       </head>
-      <body
-        className={`antialiased  bg-white`}
-      >
-        <AuthProvider>
-        <Header />
-        <main className="lg:mt-40 mt-40">
-            {children}
-        </main>
-        <BottomNav />
-        <Footer />
-        </ AuthProvider>
-
+      <body className="antialiased bg-white">
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
-  ); 
+  );
 }
