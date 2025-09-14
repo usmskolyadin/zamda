@@ -10,9 +10,15 @@ interface User {
   email: string;
   first_name: string;
   last_name: string;
-  profile: {
-    avatar: string;
-    city: string;
+    profile: {
+      id: number; 
+      username: string;
+      first_name: string;
+      last_name: string;
+      avatar: string;
+      rating: number;
+      reviews_count: number;
+      city: string;
   }
 }
 
@@ -21,6 +27,7 @@ interface AuthContextType {
   accessToken: string | null;
   login: (token: string, refresh: string, userData: User) => void;
   logout: () => void;
+  updateUser: (userData: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -94,13 +101,17 @@ const handleLogout = () => {
   router.push("/login");
 };
 
+const updateUser = (userData: User) => {
+  localStorage.setItem("user", JSON.stringify(userData));
+  setUser(userData);
+};
 
   const logout = () => {
     handleLogout();
   };
 
   return (
-    <AuthContext.Provider value={{ user, accessToken, login, logout }}>
+    <AuthContext.Provider value={{ user, accessToken, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

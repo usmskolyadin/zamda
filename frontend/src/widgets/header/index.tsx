@@ -70,12 +70,12 @@ export default function Header() {
                 {user ? (
                 <Link href={"/listings"}>
                   <div className="flex items-center">
-                    <h2 className="mr-2 font-semibold text-white ml-2">{user?.first_name} </h2>
+                    <h2 className="mr-2 font-semibold text-white ml-2 w-36 text-right">{user?.first_name} </h2>
                     <img className="rounded-full border border-gray-200 w-10 h-10"  src={user.profile.avatar} width={40} height={40} alt={""} />
                   </div>
                 </Link>
                 ) : (
-                <p ><Link href={"/login"}>Sign in</Link> | <Link href={"/register"}>Sign up</Link></p>
+                <p className='ml-8 w-36 text-right'><Link href={"/login"}>Sign in</Link> | <Link href={"/register"}>Sign up</Link></p>
                 )
                 }
               </div>

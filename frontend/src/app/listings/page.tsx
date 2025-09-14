@@ -47,7 +47,7 @@ export default function Listings() {
                         <h2 className="text-gray-800 font-medium  text-md">{user?.username}</h2>
                     </div>
                     <div className="flex items-center text-sm text-gray-700">
-                        <span className="mr-1 text-black text-lg font-bold">4.7</span>
+                        <span className="mr-1 text-black text-lg font-bold">{user?.profile.rating}</span>
                         <div className="flex text-yellow-400 mr-1">
                         {[...Array(4)].map((_, i) => (
                             <FaStar key={i} />
@@ -55,7 +55,7 @@ export default function Listings() {
                         <FaStar className="opacity-50" />
                         </div>
                         <a href="#" className="text-[#2AAEF7] text-lg ml-1 hover:underline">
-                        13 reviews
+                        {user?.profile.reviews_count} reviews
                         </a>
                     </div>
                     </div>
@@ -159,20 +159,7 @@ export default function Listings() {
 
                             <div className="flex w-full items-center mt-1">
                             <p className="text-lg text-gray-900 font-semibold mr-2">${ad.price}</p>
-                            <span className="w-8 h-8 p-2 flex items-center justify-center rounded-full bg-[#D9D9D9]">
-                                <svg
-                                width="24"
-                                height="5"
-                                viewBox="0 0 24 5"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                >
-                                <path
-                                    d="M19.7226 4.63253C19.477 4.63253 19.2682 4.55884 19.0963 4.41147C18.9489 4.23954 18.8752 4.03077 18.8752 3.78516V1.13253C18.8752 0.886912 18.9489 0.690421 19.0963 0.543052C19.2682 0.371123 19.477 0.285156 19.7226 0.285156H22.3752C22.6209 0.285156 22.8296 0.371123 23.0016 0.543052C23.1735 0.690421 23.2595 0.886912 23.2595 1.13253V3.78516C23.2595 4.03077 23.1735 4.23954 23.0016 4.41147C22.8296 4.55884 22.6209 4.63253 22.3752 4.63253H19.7226Z"
-                                    fill="black"
-                                />
-                                </svg>
-                            </span>
+
                             </div>
 
                             <p className="text-md text-gray-600 mt-2 line-clamp-3 break-all overflow-hidden">

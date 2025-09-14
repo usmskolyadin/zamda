@@ -1,10 +1,14 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/src/features/context/auth-context";
 import { apiFetchAuth } from "@/src/shared/api/auth";
 import { FaStar } from "react-icons/fa";
 import Link from "next/link";
+import { Advertisement } from "@/src/entities/advertisment/model/types";
+import { Profile } from "@/src/app/profile/[id]/page";
+import { useParams } from "next/navigation";
+import { apiFetch } from "@/src/shared/api/base";
 
 interface Props {
   profileId: number;       
@@ -16,6 +20,40 @@ export default function AddReview({ profileId, onSuccess }: Props) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
+  const params = useParams<{ id: string }>();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [ads, setAds] = useState<Advertisement[]>([]);
+  const [activeTab, setActiveTab] = useState("active");
+
+  useEffect(() => {
+    if (!profileId) return;
+
+    const fetchProfile = async () => {
+      const res = await apiFetch<Profile>(`/api/profiles/${profileId}/`);
+      console.log("profile response:", res);
+      setProfile(res);
+    };
+
+    fetchProfile();
+  }, [profileId]);
+
+  useEffect(() => {
+    if (!profile?.username) return;
+
+    const fetchAds = async () => {
+      const res = await apiFetch<{ results: Advertisement[] }>(
+        `/api/ads/?owner_username=${profile.username}`
+      );
+      setAds(res.results);
+    };
+
+    fetchAds();
+  }, [profile?.username]);
+
+
+    if (!profile) {
+      return <p className="text-center mt-10">Loading profile...</p>;
+    }
 
   const submit = async () => {
     if (!accessToken || !user) {
@@ -57,55 +95,51 @@ export default function AddReview({ profileId, onSuccess }: Props) {
         
         <div className="max-w-screen-xl lg:flex mx-auto">
           <div className="lg:w-1/4">
-            <div className="max-w-[712px]">
-                  <div className="flex-col items-center justify-between lg:border-b border-gray-300 py-3">
-                    {/* <img
-                        src={user?.profile.avatar}
-                        width={200}
-                        height={200}
-                        alt="GT Logo"
-                        className="lg:w-18 w-22 lg:h-18 h-22 rounded-full object-cover border border-gray-500"
-                    /> */}
-                    <div>
-                    {/* <div className="py-2">
-                        <h2 className="text-black font-bold  lg:text-2xl text-3xl ">{user?.first_name} {user?.last_name}</h2>
-                        <h2 className="text-gray-800 font-medium  text-md">{user?.username}</h2>
-                    </div> */}
-                    <div className="flex items-center text-sm text-gray-700">
-                        <span className="mr-1 text-black text-lg font-bold">4.7</span>
-                        <div className="flex text-yellow-400 mr-1">
-                        {[...Array(4)].map((_, i) => (
-                            <FaStar key={i} />
-                        ))}
-                        <FaStar className="opacity-50" />
-                        </div>
-                        <a href="#" className="text-[#2AAEF7] text-lg ml-1 hover:underline">
-                        13 reviews
-                        </a>
-                    </div>
-                    </div>
+            <div className="flex-col items-center justify-between lg:border-b border-gray-300 py-3">
+              <img
+                src={profile.avatar}
+                width={200}
+                height={200}
+                alt="Avatar"
+                className="lg:w-18 w-22 lg:h-18 h-22 rounded-full object-cover border border-gray-500"
+              />
+              <div className="py-2">
+                <h2 className="text-black font-bold lg:text-2xl text-3xl">
+                  {profile.first_name} {profile.last_name}
+                </h2>
+                <p className=" flex text-gray-700 font-medium items-center text-lg py-2">            
+                  <svg className="mr-1" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <g opacity="0.5">
+                          <path d="M20 10C20 14.4183 12 22 12 22C12 22 4 14.4183 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10Z" stroke="black" strokeWidth="2"/>
+                          <path d="M12 11C12.5523 11 13 10.5523 13 10C13 9.44772 12.5523 9 12 9C11.4477 9 11 9.44772 11 10C11 10.5523 11.4477 11 12 11Z" fill="black" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </g>
+                  </svg>
+                  {profile.city} 
+                </p>
+                <h2 className="text-gray-800 font-medium text-md">
+                  {profile.username}
+                </h2>
+              </div>
 
+              <div className="flex items-center text-sm text-gray-700">
+                <span className="mr-1 text-black text-lg font-bold">
+                  {profile.rating ?? "—"}
+                </span>
+                <div className="flex text-yellow-400 mr-1">
+                  {[...Array(5)].map((_, i) => (
+                    <FaStar
+                      key={i}
+                      className={i < Math.round(profile.rating) ? "" : "opacity-30"}
+                    />
+                  ))}
                 </div>
-            </div>
-            <div className="lg:block hidden">
-                <div className="py-3 flex flex-col border-b border-gray-300">
-                    <Link href="/listings"><span className="text-[#2AAEF7] text-md h-12">My Listings</span> </Link>
-                    <Link href="/favorites"><span className="text-[#2AAEF7] text-md h-12">Favorites</span></Link>
-                    <Link href="/messages"><span className="text-[#2AAEF7] text-md h-12">Messages</span></Link>
-                    <Link href="/reviews"><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
-                </div>
-                <div className="py-3 flex flex-col border-b border-gray-300">
-                    <Link aria-disabled href=""><span className="text-[#2AAEF7] text-md h-12">Wallet</span> </Link>
-                    <Link aria-disabled href=""><span className="text-[#2AAEF7] text-md h-12">Paid services</span></Link>
-                </div>
-                <div className="py-3 flex flex-col mb-4">
-                    <Link href="/profile/edit/"><span className="text-[#2AAEF7] text-md h-12">Profile settings</span> </Link>
-                </div>
-            </div>
-            <div className="rounded-3xl w-full bg-[#F2F1F0] h-[500px] lg:flex hidden  flex justify-center items-center">
-              <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
+                <span className="text-[#2AAEF7] text-lg ml-1">
+                  {profile.reviews_count} <Link href={`/reviews/add/${profile.id}`}>Add review</Link>
+                </span>
+              </div>
             </div>
           </div>
+
           <div className=" lg:w-3/4 lg:ml-24">
             <div className="rounded-3xl w-full bg-[#F2F1F0] h-[200px]  flex justify-center items-center">
               <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
