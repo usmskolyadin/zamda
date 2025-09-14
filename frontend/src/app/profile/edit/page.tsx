@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/features/context/auth-context";
+import { API_URL } from "@/src/shared/api/base";
 
 export default function ProfileEdit() {
-  const { accessToken, user, login } = useAuth();
+  const { accessToken, user, login, updateUser } = useAuth();
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -25,7 +26,7 @@ export default function ProfileEdit() {
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/users/me/", {
+        const res = await fetch(`${API_URL}/api/users/me/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -73,7 +74,7 @@ export default function ProfileEdit() {
         body.append("city", formData.city);
         if (formData.avatar) body.append("avatar", formData.avatar);
 
-        const res = await fetch("http://127.0.0.1:8000/api/users/me/", {
+        const res = await fetch(`${API_URL}/api/users/me/`, {
         method: "PATCH",
         headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -88,14 +89,14 @@ export default function ProfileEdit() {
         return;
         }
 
-        const refreshed = await fetch("http://127.0.0.1:8000/api/users/me/", {
+        const refreshed = await fetch(`${API_URL}/api/users/me/`, {
         headers: {
             Authorization: `Bearer ${accessToken}`,
         },
         });
         const newUserData = await refreshed.json();
 
-        login(accessToken!, newUserData);
+        updateUser(newUserData);
         
         setSuccess("Profile updated successfully!");
 
@@ -190,3 +191,7 @@ export default function ProfileEdit() {
     </div>
   );
 }
+function updateUser(newUserData: any) {
+  throw new Error("Function not implemented.");
+}
+

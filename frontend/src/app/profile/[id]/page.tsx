@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import { Advertisement } from "@/src/entities/advertisment/model/types";
 import { apiFetch } from "@/src/shared/api/base";
 
-interface Profile {
+export interface Profile {
   id: number;
   username: string;
   first_name: string;
@@ -25,24 +25,30 @@ export default function Listings() {
   const [ads, setAds] = useState<Advertisement[]>([]);
   const [activeTab, setActiveTab] = useState("active");
 
-  useEffect(() => {
-    if (!profileId) return;
+useEffect(() => {
+  if (!profileId) return;
 
-    const fetchProfile = async () => {
-      const res = await apiFetch<Profile>(`/api/profiles/${profileId}/`);
-      setProfile(res);
-    };
+  const fetchProfile = async () => {
+    const res = await apiFetch<Profile>(`/api/profiles/${profileId}/`);
+    setProfile(res);
+  };
 
-    const fetchAds = async () => {
-      const res = await apiFetch<{ results: Advertisement[] }>(
-        `/api/ads/?owner_profile=${profileId}`
-      );
-      setAds(res.results);
-    };
+  fetchProfile();
+}, [profileId]);
 
-    fetchProfile();
-    fetchAds();
-  }, [profileId]);
+useEffect(() => {
+  if (!profile?.username) return;
+
+  const fetchAds = async () => {
+    const res = await apiFetch<{ results: Advertisement[] }>(
+      `/api/ads/?owner_username=${profile.username}`
+    );
+    setAds(res.results);
+  };
+
+  fetchAds();
+}, [profile?.username]);
+
 
   if (!profile) {
     return <p className="text-center mt-10">Loading profile...</p>;

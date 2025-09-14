@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import AdvertisementImage, Category, Notification, SubCategory, ExtraFieldDefinition, Advertisement, AdvertisementExtraField, UserProfile
+from .models import AdvertisementImage, Category, Notification, SubCategory, ExtraFieldDefinition, Advertisement, AdvertisementExtraField, UserProfile, User
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 admin.site.register(UserProfile)
 
@@ -48,3 +49,19 @@ class NotificationAdmin(admin.ModelAdmin):
     list_display = ("title", "profile", "is_read", "created_at")
     list_filter = ("is_read", "created_at")
     search_fields = ("title", "message")
+
+class UserAdmin(BaseUserAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'is_superuser')
+    list_filter = ('is_staff', 'is_superuser', 'is_active')
+    search_fields = ('username', 'email', 'first_name', 'last_name')
+    ordering = ('username',)
+
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    )
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)

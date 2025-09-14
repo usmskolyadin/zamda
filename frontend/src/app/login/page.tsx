@@ -64,7 +64,7 @@ export default function Login() {
         <div className="max-w-screen-xl mx-auto w-">
           <p className="text-gray-500 pb-2"><Link href="/">Home</Link> / <Link href="/">Login</Link></p>
           <div className="lg:flex">
-            <h1 className="mx-auto text-black font-bold text-4xl py-4 text-center">Sign in for ZAMDA</h1>
+            <h1 className="mx-auto text-black font-bold text-4xl py-4 text-center">Sign in for Zamda</h1>
           </div>
         </div>
       </section>
