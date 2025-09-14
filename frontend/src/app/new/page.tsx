@@ -191,6 +191,7 @@ const handleSubmit = async (e: FormEvent) => {
   formData.append('subcategory_id', selectedSubcategory); 
   formData.append('is_active', String(isActive));
   formData.append('extra', JSON.stringify(extraValues));
+  formData.append('location', location); 
   console.log('selectedSubcategory:', selectedSubcategory);
   console.log('extraValues:', extraValues);
   if (images) Array.from(images).forEach(file => formData.append('images', file));
@@ -245,8 +246,8 @@ const handleSubmit = async (e: FormEvent) => {
         {selectedSubcategory && <>
           <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
             <p className="font-semibold text-black text-xl">Title</p>
-            <p className="font-medium text-gray-900">Minimum length 20 symbols</p>
-            <input type="text" placeholder="Enter title" value={title} onChange={(e) => setTitle(e.target.value)} minLength={20} maxLength={100} className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900" required />
+            <p className="font-medium text-gray-900">Minimum length 15 symbols</p>
+            <input type="text" placeholder="Enter title" value={title} onChange={(e) => setTitle(e.target.value)} minLength={15} maxLength={100} className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900" required />
           </label>
 
           <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
@@ -256,8 +257,8 @@ const handleSubmit = async (e: FormEvent) => {
 
           <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
             <p className="font-semibold text-black text-xl">Description</p>
-            <p className="font-medium text-gray-900">Minimum length 250 symbols</p>
-            <textarea placeholder="Enter description" value={description} onChange={(e) => setDescription(e.target.value)} className="p-4 border border-black rounded-3xl mt-1 text-gray-900" rows={4} required minLength={250} maxLength={2000} />
+            <p className="font-medium text-gray-900">Minimum length 150 symbols</p>
+            <textarea placeholder="Enter description" value={description} onChange={(e) => setDescription(e.target.value)} className="p-4 border border-black rounded-3xl mt-1 text-gray-900" rows={4} required minLength={150} maxLength={2000} />
           </label>
 
           <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
@@ -266,13 +267,13 @@ const handleSubmit = async (e: FormEvent) => {
           </label>
 
           <div className="lg:w-1/2 h-80 border border-black rounded-3xl overflow-hidden">
-<MapContainer center={latLng} zoom={13} style={{ height: '100%', width: '100%' }}>
-  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-  <Marker position={latLng} icon={defaultIcon}>
-    <Popup>Selected location</Popup>
-  </Marker>
-  <MapClickHandler onClick={handleMapClick} />
-</MapContainer>
+            <MapContainer center={latLng} zoom={13} style={{ height: '100%', width: '100%', zIndex: "10"  }}>
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              <Marker position={latLng} icon={defaultIcon}>
+                <Popup>Selected location</Popup>
+              </Marker>
+              <MapClickHandler onClick={handleMapClick} />
+            </MapContainer>
           </div>
 
           <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">

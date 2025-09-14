@@ -81,17 +81,26 @@ export default function Chat() {
     return () => clearInterval(t);
   }, [accessToken, chatId]);
 
-  const sendMessage = async (e: React.FormEvent) => {
+  const sendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!text.trim() || !accessToken) return;
-    const created = await apiFetchAuth<Message>("/api/messages/", accessToken, {
-      method: "POST",
-      body: JSON.stringify({ chat: chatId, text }),
-    });
-    setText("");
-    setMessages((prev) => [...prev, created]);
-    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }), 50);
+    console.log("Send button clicked", { text });
+    if (!text) return;
+
+    try {
+      const created = await apiFetchAuth<Message>("/api/messages/", {
+        method: "POST",
+        body: JSON.stringify({ chat: chatId, text }),
+      });
+      console.log("Message created:", created);
+      setText("");
+      setMessages(prev => [...prev, created]);
+    } catch (err) {
+      console.error("Failed to send message:", err);
+    }
   };
+
+
+
   if (!accessToken) {
     return (
       <div className="w-screen h-screen flex items-center justify-center bg-white">
@@ -128,7 +137,7 @@ export default function Chat() {
                     <div>
                     <h2 className="text-black font-bold  lg:text-xl text-2xl py-2">{user?.first_name} {user?.last_name}</h2>
                     <div className="flex items-center text-sm text-gray-700">
-                        <span className="mr-1 text-black text-lg font-bold">4.7</span>
+                        <span className="mr-1 text-black text-lg font-bold">{user?.profile.rating}</span>
                         <div className="flex text-yellow-400 mr-1">
                         {[...Array(4)].map((_, i) => (
                             <FaStar key={i} />
@@ -136,7 +145,7 @@ export default function Chat() {
                         <FaStar className="opacity-50" />
                         </div>
                         <a href="#" className="text-[#2AAEF7] text-lg ml-1 hover:underline">
-                        13 reviews
+                        {user?.profile.reviews_count} reviews
                         </a>
                     </div>
                     </div>
@@ -213,15 +222,23 @@ export default function Chat() {
                     <div className="p-4">Загрузка сообщений...</div>
                     ) : (
                 <div className="p-4 h-[60vh] overflow-y-auto">
-                {messages.map((m) => {
-                    const mine = m.sender === user?.id;
-                    return (
-                    <div key={m.id} className={`flex mb-2 ${mine ? "justify-end" : "justify-start"}`}>
+                {messages.map((m, index) => {
+                  const mine = m.sender === user?.id;
+                  const key = m.id ?? `temp-${index}`;
+                  return (
+                    <div key={m.id ?? index} className={`flex mb-2 ${mine ? "justify-end" : "justify-start"}`}>
                         <div className={`rounded-2xl px-4 py-2 max-w-[75%] ${mine ? "bg-blue-500 text-white" : "bg-gray-100 text-black"}`}>
                         <div className="whitespace-pre-wrap break-words">{m.text}</div>
                         <div className={`text-[10px] mt-1 ${mine ? "text-blue-100" : "text-gray-500"}`}>
-                           {new Date(m.created_at).toISOString().slice(0, 16).replace("T", " ")}
-
+                          {m.created_at 
+                            ? new Date(m.created_at).toLocaleString([], { 
+                                year: "numeric", 
+                                month: "2-digit", 
+                                day: "2-digit", 
+                                hour: "2-digit", 
+                                minute: "2-digit" 
+                              }) 
+                            : "—"}
                         </div>
                         </div>
                     </div>
