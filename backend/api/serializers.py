@@ -1,3 +1,4 @@
+import json
 from rest_framework import serializers
 from .models import (
     AdvertisementImage, Category, Chat, Notification, Review, SubCategory,
@@ -231,35 +232,37 @@ class AdvertisementSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-        import json
+        # import json
 
-        # Обновляем subcategory если есть
-        subcategory_data = validated_data.pop('subcategory', None)
-        if subcategory_data:
-            if isinstance(subcategory_data, str):
-                subcategory_data = json.loads(subcategory_data)
-            subcategory_id = subcategory_data.get('id') if isinstance(subcategory_data, dict) else subcategory_data
-            validated_data['subcategory'] = SubCategory.objects.get(id=int(subcategory_id))
+        # # Обновляем subcategory если есть
+        # subcategory_data = validated_data.pop('subcategory', None)
+        # if subcategory_data:
+        #     if isinstance(subcategory_data, str):
+        #         subcategory_data = json.loads(subcategory_data)
+        #     subcategory_id = subcategory_data.get('id') if isinstance(subcategory_data, dict) else subcategory_data
+        #     validated_data['subcategory'] = SubCategory.objects.get(id=int(subcategory_id))
 
-        # Обновляем объявление
-        ad = super().update(instance, validated_data)
+        # # Обновляем объявление
+        # ad = super().update(instance, validated_data)
 
         # Обновляем extra поля
         extra_dict = validated_data.pop('extra', None)
+
+        ad = super().update(instance, validated_data)
+
         if extra_dict is not None:
-            instance.extra_values.all().delete()
+            ad.extra_values.all().delete()
             if isinstance(extra_dict, str):
                 extra_dict = json.loads(extra_dict)
-            prepared = self._validate_and_prepare_extra(instance.subcategory, extra_dict or {})
+            prepared = self._validate_and_prepare_extra(ad.subcategory, extra_dict or {})
             for definition, casted_str in prepared:
                 AdvertisementExtraField.objects.create(
-                    ad=instance,
+                    ad=ad,
                     field_definition=definition,
                     value=str(casted_str)
                 )
 
         return ad
-
 
 class MessageSerializer(serializers.ModelSerializer):
     chat = serializers.PrimaryKeyRelatedField(queryset=Chat.objects.all())

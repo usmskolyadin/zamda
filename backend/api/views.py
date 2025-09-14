@@ -146,18 +146,15 @@ class CurrentUserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = request.user
-        profile = getattr(user, 'profile', None)
+        from .serializers import ProfileSerializer
+        profile = request.user.profile
         return Response({
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "profile": {
-                "avatar": request.build_absolute_uri(profile.avatar.url) if profile and profile.avatar else None,
-                "city": profile.city if profile else None,
-            }
+            "id": request.user.id,
+            "username": request.user.username,
+            "email": request.user.email,
+            "first_name": request.user.first_name,
+            "last_name": request.user.last_name,
+            "profile": ProfileSerializer(profile, context={"request": request}).data
         })
 
     def patch(self, request):
@@ -193,19 +190,18 @@ class ChatViewSet(viewsets.ModelViewSet):
         ad = serializer.validated_data["ad"]
         buyer = self.request.user
         seller = ad.owner
-
-        if seller == buyer:
+        if buyer == seller:
             raise ValidationError("Нельзя создать чат с самим собой")
-
+        
         chat, created = Chat.objects.get_or_create(
             ad=ad,
             buyer=buyer,
             seller=seller
         )
-
         serializer.instance = chat
         if created:
             serializer.save(buyer=buyer, seller=seller)
+
 
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
@@ -226,39 +222,37 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
+    from django.db.models import Q
 
     def get_queryset(self):
         chat_id = self.request.query_params.get('chat')
         if chat_id:
+            chat_id = int(chat_id)
             return Message.objects.filter(
-                chat_id=chat_id,
-                chat__buyer=self.request.user
-            ) | Message.objects.filter(
-                chat_id=chat_id,
-                chat__seller=self.request.user
+                Q(chat_id=chat_id) & (Q(chat__buyer=self.request.user) | Q(chat__seller=self.request.user))
             )
+
         return Message.objects.none()
             
     def perform_create(self, serializer):
-        chat = serializer.validated_data.get('chat', None)
-        if not chat or not getattr(chat, 'id', None):
-            raise ValidationError("Chat is required and must have an id")
-
-        chat = get_object_or_404(Chat, id=chat.id)
-        if self.request.user != chat.buyer and self.request.user != chat.seller:
+        chat_id = serializer.validated_data.get('chat')
+        chat_obj = get_object_or_404(Chat, id=chat_id.id if hasattr(chat_id, 'id') else chat_id)
+        
+        if self.request.user != chat_obj.buyer and self.request.user != chat_obj.seller:
             raise ValidationError("You are not a participant of this chat")
-
-        serializer.save(sender=self.request.user)
-
+        
+        serializer.save(sender=self.request.user, chat=chat_obj)
+        
     def create(self, request, *args, **kwargs):
         try:
-            return super().create(request, *args, **kwargs)
+            response = super().create(request, *args, **kwargs)
+            return response
         except ValidationError as e:
             return Response({"detail": e.detail}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            print(f"Unexpected error: {str(e)}")
+            print(f"Unexpected error: {e}")
             return Response({"detail": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
