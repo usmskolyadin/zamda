@@ -27,9 +27,10 @@ SECRET_KEY = 'django-insecure-g6=4tsza_e1h&_bztpn6e4df!^1y=6y2z#bhmi%ahi*wxe#ob0
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "*"
     "zamda.com",
     "www.zamda.com",
+    "127.0.0.1",
+    "localhost",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
