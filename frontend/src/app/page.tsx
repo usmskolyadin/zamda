@@ -7,6 +7,7 @@ export default async function Home() {
 
   try {
     categories = await getCategories();
+    console.log("Categories from API:", categories);
   } catch (e) {
     console.warn("Failed to fetch categories", e);
     categories = [];

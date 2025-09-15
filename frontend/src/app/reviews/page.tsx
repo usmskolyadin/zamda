@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/src/features/context/auth-context";
 import { apiFetchAuth } from "@/src/shared/api/auth";
 import { FaStar } from "react-icons/fa";
 import Link from "next/link";
+import { Profile } from "../profile/[id]/page";
+import { apiFetch } from "@/src/shared/api/base";
 
 interface Props {
   profileId: number;       
@@ -16,7 +18,21 @@ export default function Reviews({ profileId, onSuccess }: Props) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  if (!profile) return <div className="text-black">Loading...</div>;
 
+  useEffect(() => {
+    if (!profileId) return;
+
+    const fetchProfile = async () => {
+      const res = await apiFetch<Profile>(`/api/profiles/${profileId}/`);
+      console.log("profile response:", res);
+      setProfile(res);
+    };
+
+    fetchProfile();
+  }, [profileId]);
+  
   const submit = async () => {
     if (!accessToken || !user) {
       alert("You must be logged in to leave a review");
@@ -28,15 +44,7 @@ export default function Reviews({ profileId, onSuccess }: Props) {
         await apiFetchAuth(
         `/api/reviews/`,
         accessToken,
-        {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-            profile: profileId, 
-            rating,
-            comment,
-            }),
-        }
+
         );
 
 
