@@ -38,9 +38,8 @@ export default async function AdsBySubcategory({ params }: Props) {
           <div className=" lg:w-2/3">
             <div>
               <h1 className="text-black font-bold text-3xl py-4">Popular "{subcategory.name}"</h1>
-            
             </div>
-            <div className="rounded-3xl w-full bg-[#F2F1F0] h-[200px] mt-6 flex justify-center items-center">
+            <div className="rounded-3xl  w-full bg-[#F2F1F0] h-[200px] mt-6 flex justify-center items-center">
               <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
             </div>
             <div className="mt-4 py-2 flex items-center cursor-pointer">
