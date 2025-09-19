@@ -47,7 +47,7 @@ export default function Listings() {
                         <h2 className="text-gray-800 font-medium  text-md">{user?.username}</h2>
                     </div>
                     <div className="flex items-center text-sm text-gray-700">
-                        <span className="mr-1 text-black text-lg font-bold">4.7</span>
+                        <span className="mr-1 text-black text-lg font-bold">{user?.profile.rating}</span>
                         <div className="flex text-yellow-400 mr-1">
                         {[...Array(4)].map((_, i) => (
                             <FaStar key={i} />
@@ -55,7 +55,7 @@ export default function Listings() {
                         <FaStar className="opacity-50" />
                         </div>
                         <a href="#" className="text-[#2AAEF7] text-lg ml-1 hover:underline">
-                        13 reviews
+                        {user?.profile.reviews_count} reviews
                         </a>
                     </div>
                     </div>

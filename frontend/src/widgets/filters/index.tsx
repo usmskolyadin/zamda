@@ -71,7 +71,7 @@ export default function Filters() {
           <select
             value={subcategory}
             onChange={(e) => setSubcategory(e.target.value)}
-            className="p-3 w-86 rounded-2xl text-black bg-[#E3E2E1]"
+            className="p-3 lg:w-86 w-full rounded-2xl text-black bg-[#E3E2E1]"
           >
             <option value="">Select subcategory</option>
             {subcategories.map((sub) => (
@@ -88,14 +88,14 @@ export default function Filters() {
               type="number"
               value={priceFrom}
               onChange={(e) => setPriceFrom(e.target.value)}
-              className="p-3 w-43 rounded-2xl mr-2 text-black bg-[#E3E2E1]"
+              className="p-3 lg:w-43 w-1/2 rounded-2xl mr-2 text-black bg-[#E3E2E1]"
               placeholder="From"
             />
             <input
               type="number"
               value={priceTo}
               onChange={(e) => setPriceTo(e.target.value)}
-              className="p-3 w-43 rounded-2xl text-black bg-[#E3E2E1]"
+              className="p-3 lg:w-43 w-1/2 rounded-2xl text-black bg-[#E3E2E1]"
               placeholder="To"
             />
           </div>
@@ -106,7 +106,7 @@ export default function Filters() {
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="p-3 w-86 rounded-2xl text-black bg-[#E3E2E1]"
+            className="p-3 lg:w-86 w-full rounded-2xl text-black bg-[#E3E2E1]"
             placeholder="City, region..."
           />
 
@@ -115,7 +115,7 @@ export default function Filters() {
           <select
             value={freshness}
             onChange={(e) => setFreshness(e.target.value)}
-            className="p-3 w-86 rounded-2xl text-black bg-[#E3E2E1]"
+            className="p-3 lg:w-86 w-full rounded-2xl text-black bg-[#E3E2E1]"
           >
             <option value="">It doesn't matter</option>
             <option value="1">Last 24h</option>
@@ -126,7 +126,7 @@ export default function Filters() {
           {/* Button */}
           <button
             onClick={handleShow}
-            className="mt-4 bg-[#2AAEF7] rounded-4xl h-[60px] w-[296px] text-white flex items-center justify-center"
+            className="mt-4 bg-[#2AAEF7] cursor-pointer hover:bg-blue-300 transition rounded-4xl h-[60px] lg:w-[350px] w-full text-white flex items-center justify-center"
           >
             Show
           </button>

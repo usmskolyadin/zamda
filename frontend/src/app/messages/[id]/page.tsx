@@ -124,7 +124,7 @@ export default function Chat() {
     <div className=" w-full">
       <section className="bg-[#ffffff]  pb-16 p-4">
         <div className="max-w-screen-xl lg:flex mx-auto">
-          <div className="lg:w-1/4">
+          <div className="lg:w-1/4 hidden lg:block">
             <div className="max-w-[712px]">
                   <div className="flex-col items-center justify-between lg:border-b border-gray-300 py-3">
                     <img
@@ -166,14 +166,12 @@ export default function Chat() {
                     <Link href="/profile/edit"><span className="text-[#2AAEF7] text-md h-12">Profile settings</span> </Link>
                 </div>
             </div>
-            <div className="rounded-3xl w-full bg-[#F2F1F0] h-[500px] lg:flex hidden  flex justify-center items-center">
-              <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
-            </div>
+
           </div>
           <div className=" lg:w-3/4 lg:ml-24">
-            {/* <div className="rounded-3xl w-full bg-[#F2F1F0] h-[200px]  flex justify-center items-center">
-              <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
-            </div> */}
+              {/* <div className="rounded-3xl w-full bg-[#F2F1F0] h-[200px]  flex justify-center items-center">
+                <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
+              </div> */}
 
 
                 <div>

@@ -26,11 +26,11 @@ export default async function SubCategoriesPage({ params }: Props) {
           <h1 className="text-black font-bold text-4xl py-4">
             {category.name}
           </h1>
-          <div className="grid grid-cols-2 lg:grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-4">
+          <div className="grid lg:grid-cols-2 lg:grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-4">
             {subcategories.map((subcategory) => (
               <Link key={subcategory.id} href={`/${category.id}/${subcategory.id}`}>
                 <div className="bg-[#F2F1F0] h-[169px] rounded-2xl flex items-center justify-between">
-                  <h2 className="font-semibold  p-4 text-black text-xl max-w-[50%]">
+                  <h2 className="font-semibold  p-4 text-black text-xl lg:max-w-[50%]">
                     {subcategory.name}
                   </h2>
                   <img

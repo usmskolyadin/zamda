@@ -84,7 +84,10 @@ if (loading) {
                         className="lg:w-18 w-22 lg:h-18 h-22 rounded-full object-cover border border-gray-500"
                     />
                     <div>
-                    <h2 className="text-black font-bold  lg:text-xl text-2xl py-2">{user?.first_name} {user?.last_name}</h2>
+                    <div className="py-2">
+                      <h2 className="text-black font-bold  lg:text-xl text-2xl ">{user?.first_name} {user?.last_name}</h2>
+                      <h2 className="text-gray-800 font-medium  text-md">{user?.username}</h2>
+                    </div>
                     <div className="flex items-center text-sm text-gray-700">
                         <span className="mr-1 text-black text-lg font-bold">{user?.profile.rating}</span>
                         <div className="flex text-yellow-400 mr-1">
@@ -126,7 +129,7 @@ if (loading) {
             <div className="lg:flex">
                 <h1 className="w-2/3 text-black font-bold lg:text-4xl text-3xl lg:py-4 lg:py-1 py-4">Messages</h1>
             </div>
-                <div>
+                {/* <div>
                     <div className="relative">
                         <input type="text" placeholder="Search messages" className="bg-gray-200 w-full p-3 pl-10 text-black rounded-xl"/>
                         <svg width="24" height="24" className="absolute top-3 left-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -141,7 +144,7 @@ if (loading) {
                         <input type="text" placeholder="Important" className="w-1/3 cursor-pointer mr-2 bg-gray-200 p-3 text-black rounded-xl"/>
                         <input type="text" placeholder="All listings" className="w-1/3 cursor-pointer bg-gray-200 p-3 text-black rounded-xl"/>
                     </div>
-                </div>
+                </div> */}
                 <div>
             </div>
             <div className="flex flex-col">
