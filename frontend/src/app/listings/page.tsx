@@ -43,7 +43,7 @@ export default function Listings() {
                     />
                     <div>
                     <div className="py-2">
-                        <h2 className="text-black font-bold  lg:text-2xl text-3xl ">{user?.first_name} {user?.last_name}</h2>
+                        <h2 className="text-black font-bold lg:text-2xl text-3xl ">{user?.first_name} {user?.last_name}</h2>
                         <h2 className="text-gray-800 font-medium  text-md">{user?.username}</h2>
                     </div>
                     <div className="flex items-center text-sm text-gray-700">
