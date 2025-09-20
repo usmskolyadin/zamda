@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { API_URL } from "@/src/shared/api/base";
 
 interface Advertisement {
   id: number;
@@ -22,7 +23,7 @@ export default function SearchBar() {
     const fetchSuggestions = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/ads/?search=${query}`);
+        const res = await fetch(`${API_URL}/api/ads/?search=${query}`);
         const data = await res.json();
         setSuggestions(data.results || []);
       } catch (error) {
@@ -37,28 +38,28 @@ export default function SearchBar() {
   }, [query]);
 
   return (
-             <div className="relative flex items-center mt-4 mb-4 lg:mt-0 lg:mb-0">
+             <div className="relative flex items-center mt-4 mb-2 lg:mt-0 lg:mb-0">
                 <input 
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    className="p-4 border-0.5 border text-gray-900 border-black rounded-3xl ml-2 h-[44px] lg:w-[510px] w-3/4" placeholder="Find an ad..." type="text" name="" id="" />
+                    className="p-4 border-0.5 border text-gray-900 border-black rounded-3xl ml-2 lg:h-[44px] h-[40] lg:w-[510px] w-3/4" placeholder="Find an ad..." type="text" name="" id="" />
                       {loading && <p className="absolute top-12 left-4 text-gray-900">Loading...</p>}
-                    {suggestions.length > 0 && (
-                        <div className="absolute top-12 left-0 w-full bg-white border border-gray-200 rounded-3xl m-1 z-50">
-                        {suggestions.map((ad) => (
-                            <Link
-                            key={ad.id}
-                            href={`/search?query=${encodeURIComponent(query)}`}
-                            className="block px-4 py-2 rounded-2xl p-2 hover:bg-gray-100 text-black"
-                            >
-                            {ad.title}
-                            </Link>
-                        ))}
-                        </div>
-                    )}
+                        {suggestions.length > 0 && (
+                            <div className="absolute top-12 left-0 w-full bg-white border border-gray-200 rounded-3xl m-1 z-50">
+                            {suggestions.map((ad) => (
+                                <Link
+                                key={ad.id}
+                                href={`/search?query=${encodeURIComponent(query)}`}
+                                className="block px-4 py-2 rounded-2xl p-2 hover:bg-gray-100 text-black"
+                                >
+                                {ad.title}
+                                </Link>
+                            ))}
+                            </div>
+                        )}
                   <Link
                     href={`/search?query=${encodeURIComponent(query)}`}
-                    className="bg-black w-[82px] absolute lg:right-0 right-[68px] h-[44px] rounded-3xl flex justify-center items-center"
+                    className="bg-black w-[82px] absolute lg:right-0 right-[68px] lg:h-[44px] h-[40px] rounded-3xl flex justify-center items-center"
                   >
                     <button className="">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
