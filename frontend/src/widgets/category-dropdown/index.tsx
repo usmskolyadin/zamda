@@ -24,7 +24,7 @@ export default function CategoryDropdown() {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className={`rounded-3xl cursor-pointer hover:bg-[#E5E9F2] p-4 h-[44px] w-[188px] flex justify-center items-center transition-colors duration-200
+        className={`rounded-3xl cursor-pointer hover:bg-[#E5E9F2] p-4 lg:h-[44px] h-[40px] w-[188px] flex justify-center items-center transition-colors duration-200
           ${open ? "bg-[#E5E9F2] text-black" : "bg-black text-white hover:text-black"}`}
       >
         <span className={open ? "text-black" : "hover:text-black text-white"}>All categories</span>

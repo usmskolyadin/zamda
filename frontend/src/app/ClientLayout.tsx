@@ -9,7 +9,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   return (
     <AuthProvider>
       <Header />
-      <main className="lg:mt-40 mt-40">{children}</main>
+      <main className="lg:mt-40 mt-32">{children}</main>
       <BottomNav />
       <Footer />
     </AuthProvider>
