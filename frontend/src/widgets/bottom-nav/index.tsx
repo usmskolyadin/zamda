@@ -13,9 +13,9 @@ const ProfileImg = (profileImgUrl: string) => {
 
 const tabs = [
   { id: "search", label: "Search", icon: <FaSearch />, href: "/search" },
-  { id: "favorites", label: "Favorites", icon: <FaHeart />, badge: 2, href: "/favorites" },
+  { id: "favorites", label: "Favorites", icon: <FaHeart />, href: "/favorites" },
   { id: "ads", label: "My Ads", icon: <FaPlusCircle />, highlight: true, href: "/listings" },
-  { id: "messages", label: "Messages", icon: <FaCommentDots />, badge: 1, href: "/messages" },
+  { id: "messages", label: "Messages", icon: <FaCommentDots />, href: "/messages" },
   { id: "profile", label: "Profile", icon: <FaUser />, href: "/listings" },
 ];
 
@@ -49,11 +49,11 @@ export default function BottomNav() {
                 {tab.label}
               </span>
 
-              {tab.badge && (
+              {/* {tab.badge && (
                 <span className="absolute top-0 right-2 bg-red-500 text-white text-xs font-bold px-1.5 rounded-full">
                   {tab.badge}
                 </span>
-              )}
+              )} */}
             </Link>
           );
         })}
