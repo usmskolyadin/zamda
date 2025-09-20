@@ -37,7 +37,7 @@ export default function BottomNav() {
               <div
                 className={`text-2xl ${
                   tab.highlight
-                    ? "text-white bg-[#2AAEF7] p-3 rounded-full"
+                    ? "text-white bg-[#2AAEF7] p-2 rounded-full"
                     : isActive
                     ? "text-[#2AAEF7]"
                     : "text-gray-500"
