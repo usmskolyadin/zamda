@@ -131,7 +131,7 @@ export default function Listings() {
             <div className="flex flex-col">
                 {ads.map((ad) => (
                 <Link key={ad.id} href={`/${ad.subcategory.category.id}/${ad.subcategory.category.id}/${ad.id}`}>
-                    <div className="lg:flex mt-4 min-w-full bg-gray-100 rounded-2xl p-2">
+                    <div className="lg:flex mt-4 min-w-full hover:opacity-70 transition bg-gray-100 rounded-2xl p-2">
                         <div className="mr-4 flex-shrink-0">
                             <img
                             src={ad.images[0]?.image}
