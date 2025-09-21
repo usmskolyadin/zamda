@@ -24,6 +24,15 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
+        <link
+          rel="icon"
+          href="/zamda-white.png"
+          type="image/png"
+        />
+        <link
+          rel="apple-touch-icon"
+          href="/zamda-white.png"
+        />
       </head>
       <body className="antialiased bg-white">
         <ClientLayout>{children}</ClientLayout>
