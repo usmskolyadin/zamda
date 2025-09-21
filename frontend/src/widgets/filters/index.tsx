@@ -68,18 +68,19 @@ export default function Filters() {
         <h1 className="text-black font-bold text-3xl py-4">Filters</h1>
         <div>
           <h1 className="text-black font-bold text-xl py-4">Subcategory</h1>
-          <select
-            value={subcategory}
-            onChange={(e) => setSubcategory(e.target.value)}
-            className="p-3 lg:w-86 w-full rounded-2xl text-black bg-[#E3E2E1]"
-          >
-            <option value="">Select subcategory</option>
-            {subcategories.map((sub) => (
-              <option key={sub.id} value={sub.id}>
-                {sub.category.name} → {sub.name}
-              </option>
-            ))}
-          </select>
+<select
+  value={subcategory}
+  onChange={(e) => setSubcategory(e.target.value)}
+  className="p-3 lg:w-86 w-full rounded-2xl text-black bg-[#E3E2E1] pr-8 appearance-none"
+>
+  <option value="">Select subcategory</option>
+  {subcategories.map((sub) => (
+    <option key={sub.id} value={sub.id}>
+      {sub.category.name} → {sub.name}
+    </option>
+  ))}
+</select>
+
 
           {/* Price */}
           <h1 className="text-black font-bold text-xl py-4">Price</h1>
@@ -111,11 +112,11 @@ export default function Filters() {
           />
 
           {/* Freshness */}
-          <h1 className="text-black font-bold text-xl py-4">Freshness</h1>
+          <h1 className="text-black font-bold text-xl py-4">Date Posted</h1>
           <select
             value={freshness}
             onChange={(e) => setFreshness(e.target.value)}
-            className="p-3 lg:w-86 w-full rounded-2xl text-black bg-[#E3E2E1]"
+            className="p-3 lg:w-86 w-full rounded-2xl text-black bg-[#E3E2E1] appearance-none"
           >
             <option value="">It doesn't matter</option>
             <option value="1">Last 24h</option>

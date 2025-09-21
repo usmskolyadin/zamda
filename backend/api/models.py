@@ -122,7 +122,7 @@ class AdvertisementExtraField(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, default="/media/profile.png")
     city = models.CharField(max_length=100, blank=True)
     # reviews = models.ManyToManyField(Review, blank=True)
 

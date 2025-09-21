@@ -76,7 +76,7 @@ export default async function AdsBySubcategory({ params }: Props) {
               ) : (
                 ads.map((ad) => (
 
-                    <div key={ad.id} className="bg-[#F2F1F0] rounded-2xl p-4 lg:flex mt-3">
+                    <div key={ad.id} className="bg-[#F2F1F0] rounded-2xl hover:opacity-70 transition p-4 lg:flex mt-3">
                       <div className="lg:w-1/3">
                         <div className="relative">
                           <img
