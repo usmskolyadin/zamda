@@ -1,5 +1,3 @@
-
-
 'use client'
 
 import { API_URL } from "@/src/shared/api/base";
@@ -8,56 +6,90 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Register() {
+  const [step, setStep] = useState<"form" | "verify">("form");
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
     email: "",
     password: "",
-    password2: "", 
+    password2: "",
   });
-
+  const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const router = useRouter()
+  const router = useRouter();
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: any) => {
+  // Проверки
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePassword = (password: string) =>
+    /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(password);
+
+  // 1 шаг — регистрация (отправка письма с кодом)
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
+    if (!validateEmail(formData.email)) {
+      setError("Invalid email format");
+      return;
+    }
+    if (!validatePassword(formData.password)) {
+      setError("Password must be at least 8 characters long, include an uppercase letter, a number, and a special character.");
+      return;
+    }
     if (formData.password !== formData.password2) {
       setError("Passwords do not match");
       return;
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/register/`, {
+      const res = await fetch(`${API_URL}/api/register/request/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData), 
+        body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
+      const data = await res.json();
+      if (!res.ok) {
         setError(data.detail || "Something went wrong");
       } else {
-        setSuccess("Registration successful! You can now log in.");
-        setFormData({
-          first_name: "",
-          last_name: "",
-          email: "",
-          password: "",
-          password2: "",
-        });
-        router.push("/login")
+        setSuccess("Verification code sent to your email!");
+        setStep("verify");
       }
-    } catch (err) {
-      setError("Network error. Please try again later.");
+    } catch {
+      setError("Network error. Please try again.");
+    }
+  };
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    try {
+      const res = await fetch(`${API_URL}/api/register/verify/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email, code }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.detail || "Invalid code");
+      } else {
+        setSuccess("Registration complete!");
+        localStorage.setItem("access", data.access);
+        localStorage.setItem("refresh", data.refresh);
+
+        setTimeout(() => router.push("/login"), 1500);
+      }
+    } catch {
+      setError("Network error. Please try again.");
     }
   };
 
@@ -76,89 +108,97 @@ export default function Register() {
 
       <section className="bg-[#ffffff] pb-16 p-4">
         <div className="max-w-screen-xl lg:flex mx-auto">
-          <div className="flex-col items-center mx-auto mt-4 mb-4 lg:mt-0 lg:mb-0 w-full max-w-md">
-             <button className="p-4 border-0.5 border text-gray-900 border-black rounded-3xl h-[44px] w-full flex items-center justify-center mt-2" id="" >
+          <div className="flex-col items-center mx-auto mt-4 mb-4 w-full max-w-md">
+            
+            {step === "form" && (
+              <form onSubmit={handleRegister}>
                 <div className="flex">
-                  <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 48 48">
-                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
-                  </svg>
-                  <span className="ml-2">Continue with Google</span>
+                  <input
+                    className="text-black p-4 border border-black rounded-3xl h-[44px] w-1/2 mr-2 mt-2"
+                    placeholder="First name"
+                    type="text"
+                    name="first_name"
+                    value={formData.first_name}
+                    onChange={handleChange}
+                    required
+                  />
+                  <input
+                    className="text-black p-4 border border-black rounded-3xl h-[44px] w-1/2 mt-2"
+                    placeholder="Last name"
+                    type="text"
+                    name="last_name"
+                    value={formData.last_name}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
-              </button>
-              <button className="p-4 border-0.5 border text-gray-900 border-black rounded-3xl h-[44px] w-full flex items-center justify-center mt-2" id="" >
-                <div className="flex">
-                  <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 48 48">
-                    <path fill="#039be5" d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z"></path><path fill="#fff" d="M26.572,29.036h4.917l0.772-4.995h-5.69v-2.73c0-2.075,0.678-3.915,2.619-3.915h3.119v-4.359c-0.548-0.074-1.707-0.236-3.897-0.236c-4.573,0-7.254,2.415-7.254,7.917v3.323h-4.701v4.995h4.701v13.729C22.089,42.905,23.032,43,24,43c0.875,0,1.729-0.08,2.572-0.194V29.036z"></path>
-                  </svg>
-                  <span className="ml-2">Continue with Facebook</span>
-                </div>
-              </button>
-              <div className="flex items-center my-6">
-                <hr className="flex-grow border-t border-black" />
-                <span className="mx-4 text-black">or</span>
-                <hr className="flex-grow border-t border-black" />
-              </div>
-            <form onSubmit={handleSubmit}>
-              <div className="flex">
                 <input
-                  className="p-4 border-0.5 border text-gray-900 border-black rounded-3xl h-[44px] w-1/2 mr-2 mt-2"
-                  placeholder="First name"
-                  type="text"
-                  name="first_name"
-                  value={formData.first_name}
+                  className="text-black p-4 border border-black rounded-3xl h-[44px] w-full mt-2"
+                  placeholder="Email"
+                  type="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
                   required
                 />
                 <input
-                  className="p-4 border-0.5 border text-gray-900 border-black rounded-3xl h-[44px] w-1/2 mt-2"
-                  placeholder="Last name"
-                  type="text"
-                  name="last_name"
-                  value={formData.last_name}
+                  className="text-black p-4 border border-black rounded-3xl h-[44px] w-full mt-2"
+                  placeholder="Password"
+                  type="password"
+                  name="password"
+                  value={formData.password}
                   onChange={handleChange}
                   required
                 />
-              </div>
-              <input
-                className="p-4 border-0.5 border text-gray-900 border-black rounded-3xl h-[44px] w-full mt-2"
-                placeholder="Email"
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-              <input
-                className="p-4 border-0.5 border text-gray-900 border-black rounded-3xl h-[44px] w-full mt-2"
-                placeholder="Password"
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-              <input
-                name="password2"
-                value={formData.password2}
-                onChange={handleChange}
-                placeholder="Confirm password"
-                type="password"
-                className="p-4 border-0.5 border text-gray-900 border-black rounded-3xl h-[44px] w-full mt-2"
-              />
+                <input
+                  className="text-black p-4 border border-black rounded-3xl h-[44px] w-full mt-2"
+                  placeholder="Confirm password"
+                  type="password"
+                  name="password2"
+                  value={formData.password2}
+                  onChange={handleChange}
+                  required
+                />
 
-              {error && <p className="text-red-500 mt-2 text-center">{error}</p>}
-              {success && <p className="text-green-500 mt-2 text-center">{success}</p>}
+                {error && <p className="text-red-500 mt-2 text-center">{error}</p>}
+                {success && <p className="text-green-500 mt-2 text-center">{success}</p>}
 
-              <p className="text-black mt-4 text-center">
-                Already have an account? <Link className="underline" href="/login">Log in</Link>
-              </p>
-              <button
-                type="submit"
-                className="mt-2 bg-black w-[120px] mx-auto h-[44px] rounded-3xl flex justify-center items-center text-white"
-              >
-                Register
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  className="mt-4 cursor-pointer bg-black w-full h-[44px] rounded-3xl flex justify-center items-center text-white"
+                >
+                  Register
+                </button>
+              </form>
+            )}
+
+            {step === "verify" && (
+              <form onSubmit={handleVerify}>
+                <input
+                  className="p-4 text-black border border-black rounded-3xl h-[44px] w-full mt-2"
+                  placeholder="Enter verification code"
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  required
+                />
+
+                {error && <p className="text-red-500 mt-2 text-center">{error}</p>}
+                {success && <p className="text-green-500 mt-2 text-center">{success}</p>}
+
+                <button
+                  type="submit"
+                  className="mt-4 cursor-pointer bg-black w-full h-[44px] rounded-3xl flex justify-center items-center text-white"
+                >
+                  Verify & Finish
+                </button>
+              </form>
+            )}
+
+            <p className="text-black mt-4 text-center">
+              Already have an account?{" "}
+              <Link className="underline" href="/login">Log in</Link>
+            </p>
           </div>
         </div>
       </section>

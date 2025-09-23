@@ -90,7 +90,7 @@ export default function Notifications() {
                     <Link href="/listings"><span className="text-[#2AAEF7] text-md h-12">My Listings</span> </Link>
                     <Link href="/favorites"><span className="text-[#2AAEF7] text-md h-12">Favorites</span></Link>
                     <Link href="/messages"><span className="text-[#2AAEF7] text-md h-12">Messages</span></Link>
-                    <Link href="/reviews"><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
+                    <Link href={`/reviews/${user?.profile.id}`}><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
                 </div>
                 <div className="py-3 flex flex-col border-b border-gray-300">
                     <Link aria-disabled href=""><span className="text-[#2AAEF7] text-md h-12">Wallet (Soon)</span> </Link>

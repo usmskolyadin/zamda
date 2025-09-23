@@ -122,7 +122,7 @@ class AdvertisementExtraField(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, default="/media/profile.png")
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, default="/profile.png")
     city = models.CharField(max_length=100, blank=True)
     # reviews = models.ManyToManyField(Review, blank=True)
 
@@ -215,3 +215,19 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review by {self.author.username} for {self.profile.user.username}"
+    
+
+from django.db import models
+from django.utils import timezone
+import uuid
+
+class EmailVerification(models.Model):
+    email = models.EmailField(unique=True)
+    code = models.CharField(max_length=6)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    password = models.CharField(max_length=128)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timezone.timedelta(minutes=10)

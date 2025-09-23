@@ -144,7 +144,7 @@ export default async function AdsBySubcategory({ params }: Props) {
                                     {ad.owner?.first_name} {ad.owner?.last_name}
                                   </h2>
                                   <div className="flex items-center text-sm text-gray-700">
-                                    <span className="mr-1 text-black text-md font-bold">4.7</span>
+                                    <span className="mr-1 text-black text-md font-bold">{ad.owner.profile?.rating}</span>
                                     <div className="flex text-yellow-400 mr-1">
                                       {[...Array(4)].map((_, i) => (
                                         <FaStar key={i} />
@@ -154,7 +154,7 @@ export default async function AdsBySubcategory({ params }: Props) {
                                     <p
                                       className="text-[#2AAEF7] text-md ml-1 hover:underline"
                                     >
-                                      13 reviews
+                                      {ad.owner.profile?.reviews_count} reviews
                                     </p>
                                   </div>
                                </Link>
