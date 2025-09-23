@@ -230,81 +230,152 @@ const handleSubmit = async (e: FormEvent) => {
 
   return (
 <div className="w-full">
-  <section className="bg-[#ffffff] pt-8 p-4">
+  <section className="bg-white pt-8 px-4">
     <div className="max-w-screen-xl mx-auto">
       <h1 className="text-black text-center font-bold text-4xl py-4">New ad</h1>
     </div>
   </section>
 
-  <section className="bg-[#ffffff] pb-16 p-4 h-screen overflow-auto">
+  <section className="bg-white pb-16 px-4 h-screen overflow-auto">
     <div className="text-black max-w-screen-xl mx-auto">
-      <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center w-full gap-4">
-
-        <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col items-center justify-center w-full gap-6"
+      >
+        <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
           <p className="font-semibold text-black text-xl">Category</p>
-          <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="p-4 border border-black rounded-3xl h-[55px] mt-1 text-gray-900" required>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="p-4 border border-black rounded-3xl h-[55px] mt-1 text-gray-900"
+            required
+          >
             <option value="">Select category</option>
-            {categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
           </select>
         </label>
 
         {selectedCategory && (
-          <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
+          <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
             <p className="font-semibold text-black text-xl">Subcategory</p>
-            <select value={selectedSubcategory} onChange={(e) => setSelectedSubcategory(e.target.value)} className="p-4 border border-black rounded-3xl h-[55px] mt-1 text-gray-900" required>
+            <select
+              value={selectedSubcategory}
+              onChange={(e) => setSelectedSubcategory(e.target.value)}
+              className="p-4 border border-black rounded-3xl h-[55px] mt-1 text-gray-900"
+              required
+            >
               <option value="">Select subcategory</option>
-              {subcategories.map((sub) => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
+              {subcategories.map((sub) => (
+                <option key={sub.id} value={sub.id}>
+                  {sub.name}
+                </option>
+              ))}
             </select>
           </label>
         )}
 
-        {selectedSubcategory && <>
-          <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-            <p className="font-semibold text-black text-xl">Title</p>
-            <p className="font-medium text-gray-900">Minimum length 15 symbols</p>
-            <input type="text" placeholder="Enter title" value={title} onChange={(e) => setTitle(e.target.value)} minLength={15} maxLength={100} className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900" required />
-          </label>
+        {selectedSubcategory && (
+          <>
+            <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
+              <p className="font-semibold text-black text-xl">Title</p>
+              <p className="font-medium text-gray-900">
+                Minimum length 15 symbols
+              </p>
+              <input
+                type="text"
+                placeholder="Enter title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                minLength={15}
+                maxLength={100}
+                className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900"
+                required
+              />
+            </label>
 
-          <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-            <p className="font-semibold text-black text-xl">Price ($)</p>
-            <input type="number" placeholder="Enter price" value={price} onChange={(e) => setPrice(e.target.value)} className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900" required />
-          </label>
+            <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
+              <p className="font-semibold text-black text-xl">Price ($)</p>
+              <input
+                type="number"
+                placeholder="Enter price"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900"
+                required
+              />
+            </label>
 
-          <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-            <p className="font-semibold text-black text-xl">Description</p>
-            <p className="font-medium text-gray-900">Minimum length 150 symbols</p>
-            <textarea placeholder="Enter description" value={description} onChange={(e) => setDescription(e.target.value)} className="p-4 border border-black rounded-3xl mt-1 text-gray-900" rows={4} required minLength={150} maxLength={2000} />
-          </label>
+            <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
+              <p className="font-semibold text-black text-xl">Description</p>
+              <p className="font-medium text-gray-900">
+                Minimum length 100 symbols
+              </p>
+              <textarea
+                placeholder="Enter description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="p-4 border border-black rounded-3xl mt-1 text-gray-900"
+                rows={4}
+                required
+                minLength={100}
+                maxLength={2000}
+              />
+            </label>
 
-          <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-            <p className="font-semibold text-black text-xl">Location</p>
-            <input type="text" placeholder="Enter location or select on map" value={location} onChange={handleLocationChange} className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900 mb-2" required />
-          </label>
+            <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
+              <p className="font-semibold text-black text-xl">Location</p>
+              <input
+                type="text"
+                placeholder="Enter location or select on map"
+                value={location}
+                onChange={handleLocationChange}
+                className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900 mb-2"
+                required
+              />
+            </label>
 
-          <div className="lg:w-1/2 h-80 border border-black rounded-3xl overflow-hidden">
-            <MapContainer center={latLng} zoom={13} style={{ height: '100%', width: '100%', zIndex: "10"  }}>
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            <div className="w-full max-w-md h-80 border border-black rounded-3xl overflow-hidden">
+              <MapContainer
+                center={latLng}
+                zoom={13}
+                style={{ height: "100%", width: "100%", zIndex: "10" }}
+              >
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 {defaultIcon && (
-                <Marker position={latLng} icon={defaultIcon}>
+                  <Marker position={latLng} icon={defaultIcon}>
                     <Popup>Selected location</Popup>
-                </Marker>
+                  </Marker>
                 )}
-              <MapClickHandler onClick={handleMapClick} />
-            </MapContainer>
-          </div>
+                <MapClickHandler onClick={handleMapClick} />
+              </MapContainer>
+            </div>
 
-          <label className="lg:w-1/2 flex-col flex font-semibold text-gray-800 mt-2">
-            <p className="font-semibold text-black text-xl">Images</p>
-            <input type="file" multiple onChange={(e) => setImages(e.target.files)} className="p-4 border border-black rounded-3xl mt-1 text-gray-900" />
-          </label>
+            <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
+              <p className="font-semibold text-black text-xl">Images</p>
+              <input
+                type="file"
+                multiple
+                onChange={(e) => setImages(e.target.files)}
+                className="p-4 border border-black rounded-3xl mt-1 text-gray-900"
+              />
+            </label>
 
-          <button type="submit" className="bg-black text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition">
-            Create Ad
-          </button>
-        </>}
+            <button
+              type="submit"
+              className="bg-black text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition"
+            >
+              Create Ad
+            </button>
+          </>
+        )}
       </form>
     </div>
   </section>
 </div>
+
   );
 }

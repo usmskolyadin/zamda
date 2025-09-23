@@ -170,3 +170,11 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,  
     "AUTH_HEADER_TYPES": ('Bearer',),
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "support@zamda.net" 
+EMAIL_HOST_PASSWORD = "grvf ddbu wxcy eqvu" 
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

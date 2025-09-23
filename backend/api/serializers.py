@@ -325,3 +325,16 @@ class NotificationSerializer(serializers.ModelSerializer):
         model = Notification
         fields = ["id", "title", "message", "is_read", "created_at"]
 
+from rest_framework import serializers
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
+
+class RegisterRequestSerializer(serializers.Serializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+class VerifyCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField()

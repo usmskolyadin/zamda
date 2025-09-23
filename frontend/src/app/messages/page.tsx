@@ -71,7 +71,6 @@ if (loading) {
   return (
     <div className=" w-full">
       <section className="bg-[#ffffff]  pb-16 p-4">
-        
         <div className="max-w-screen-xl lg:flex mx-auto">
           <div className="lg:w-1/4">
             <div className="max-w-[712px]">
@@ -80,14 +79,15 @@ if (loading) {
                         src={user?.profile.avatar}
                         width={200}
                         height={200}
-                        alt="GT Logo"
+                        alt="Your avatar"
                         className="lg:w-18 w-22 lg:h-18 h-22 rounded-full object-cover border border-gray-500"
                     />
                     <div>
                     <div className="py-2">
-                      <h2 className="text-black font-bold  lg:text-xl text-2xl ">{user?.first_name} {user?.last_name}</h2>
+                        <h2 className="text-black font-bold  lg:text-2xl text-3xl ">{user?.first_name} {user?.last_name}</h2>
                       <h2 className="text-gray-800 font-medium  text-md">{user?.username}</h2>
                     </div>
+
                     <div className="flex items-center text-sm text-gray-700">
                         <span className="mr-1 text-black text-lg font-bold">{user?.profile.rating}</span>
                         <div className="flex text-yellow-400 mr-1">
@@ -100,6 +100,14 @@ if (loading) {
                         {user?.profile.reviews_count} reviews
                         </a>
                     </div>
+                    <div className="lg:hidden block py-4">
+                      <Link href={"/new"}>
+                        <button className="w-full p-4 bg-blue-500 rounded-2xl cursor-pointer hover:bg-green-500 transition ">Place an ad</button>
+                      </Link>
+                      <Link href={"/profile/edit"}>
+                        <button className="w-full mt-2 p-4 bg-[#36B731] rounded-2xl cursor-pointer hover:bg-green-500 transition ">Edit profile</button>
+                      </Link>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -108,7 +116,7 @@ if (loading) {
                     <Link href="listings"><span className="text-[#2AAEF7] text-md h-12">My Listings</span> </Link>
                     <Link href="favorites"><span className="text-[#2AAEF7] text-md h-12">Favorites</span></Link>
                     <Link href="messages"><span className="text-[#2AAEF7] text-md h-12">Messages</span></Link>
-                    <Link href="reviews"><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
+                    <Link href={`/reviews/${user?.profile.id}`}><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
                 </div>
                 <div className="py-3 flex flex-col border-b border-gray-300">
                     <Link href="listings"><span className="text-[#2AAEF7] text-md h-12">Wallet</span> </Link>
@@ -172,7 +180,7 @@ if (loading) {
         ))}
 
         {items.length === 0 && (
-          <div className="text-gray-500">У тебя пока нет переписок.</div>
+          <div className="text-gray-500">You don't have messages</div>
         )}
 
                 {/* <Link href={"/messages/someone"}>
