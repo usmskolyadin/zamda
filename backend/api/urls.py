@@ -1,7 +1,7 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path, include
 from .views import (
-    CategoryViewSet, ChatViewSet, CurrentUserView, MessageViewSet, NotificationViewSet, RegisterView, ReviewViewSet, SubCategoryViewSet, ExtraFieldDefinitionViewSet, AdvertisementViewSet, UserAdvertisementViewSet, UserProfileViewSet
+    CategoryViewSet, ChatViewSet, CurrentUserView, MessageViewSet, NotificationViewSet, RegisterRequestView, RegisterView, ReviewViewSet, SubCategoryViewSet, ExtraFieldDefinitionViewSet, AdvertisementViewSet, UserAdvertisementViewSet, UserProfileViewSet, VerifyCodeView
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -22,4 +22,6 @@ urlpatterns = [
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('users/me/', CurrentUserView.as_view(), name='current_user'), 
+    path('register/request/', RegisterRequestView.as_view(), name='register_request'),
+    path('register/verify/', VerifyCodeView.as_view(), name='register_verify'),
 ]

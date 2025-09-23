@@ -58,8 +58,15 @@ export default function Listings() {
                         {user?.profile.reviews_count} reviews
                         </a>
                     </div>
+                    <div className="lg:hidden block py-4">
+                      <Link href={"/new"}>
+                        <button className="w-full p-4 bg-blue-500 rounded-2xl cursor-pointer hover:bg-green-500 transition ">Place an ad</button>
+                      </Link>
+                      <Link href={"/profile/edit"}>
+                        <button className="w-full mt-2 p-4 bg-[#36B731] rounded-2xl cursor-pointer hover:bg-green-500 transition ">Edit profile</button>
+                      </Link>
                     </div>
-
+                    </div>
                 </div>
             </div>
             <div className="lg:block hidden">
@@ -67,7 +74,7 @@ export default function Listings() {
                     <Link href="/listings"><span className="text-[#2AAEF7] text-md h-12">My Listings</span> </Link>
                     <Link href="/favorites"><span className="text-[#2AAEF7] text-md h-12">Favorites</span></Link>
                     <Link href="/messages"><span className="text-[#2AAEF7] text-md h-12">Messages</span></Link>
-                    <Link href="/reviews"><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
+                    <Link href={`/reviews/${user?.profile.id}`}><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
                 </div>
                 <div className="py-3 flex flex-col border-b border-gray-300">
                     <Link aria-disabled href=""><span className="text-[#2AAEF7] text-md h-12">Wallet (Soon)</span> </Link>
@@ -129,7 +136,23 @@ export default function Listings() {
                 <div>
             </div>
             <div className="flex flex-col">
-                {ads.map((ad) => (
+               {ads.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <img
+                    src="/not_found.png" 
+                    alt="No ads available"
+                    className="w-86 h-86 object-contain"
+                  />
+                <p className="text-black text-3xl font-bold text-center">
+                  So far you do not have any ads.
+                </p>
+                <p className="text-black text-xl font-medium text-center mt-2">
+                  You can always create your own ad.
+                </p>
+
+                </div>
+              ) : (
+                ads.map((ad) => (
                 <Link key={ad.id} href={`/${ad.subcategory.category.id}/${ad.subcategory.category.id}/${ad.id}`}>
                     <div className="lg:flex mt-4 min-w-full hover:opacity-70 transition bg-gray-100 rounded-2xl p-2">
                         <div className="mr-4 flex-shrink-0">
@@ -165,8 +188,6 @@ export default function Listings() {
                             <p className="text-md text-gray-600 mt-2 line-clamp-3 break-all overflow-hidden">
                                 {ad.description}
                             </p>
-
-
                             <div className="flex justify-between w-1/3 mt-2">
                             <div className="flex items-center">
                                 <svg
@@ -215,7 +236,7 @@ export default function Listings() {
                         </div>
 
                 </Link>
-                ))}
+                )))}
             </div>
           </div>
         </div>

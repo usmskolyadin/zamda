@@ -257,8 +257,8 @@ class MessageViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticated]
-
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
@@ -268,3 +268,89 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ProfileSerializer
 
 
+import random
+from django.core.mail import send_mail
+from rest_framework import generics, status
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
+from rest_framework_simplejwt.tokens import RefreshToken
+from .models import EmailVerification
+from .serializers import RegisterRequestSerializer, VerifyCodeSerializer
+from rest_framework.permissions import AllowAny
+
+class RegisterRequestView(generics.GenericAPIView):
+    serializer_class = RegisterRequestSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        code = str(random.randint(100000, 999999))
+        data = serializer.validated_data
+
+        EmailVerification.objects.update_or_create(
+            email=data["email"],
+            defaults={
+                "code": code,
+                "first_name": data["first_name"],
+                "last_name": data["last_name"],
+                "password": make_password(data["password"]),
+            },
+        )
+
+        send_mail(
+            subject="ZAMDA - Confirm your registration",
+            message=f"Your verification code: {code}",
+            from_email="support@zamda.net",
+            recipient_list=[data["email"]],
+        )
+
+        return Response({"detail": "Verification code sent to email."}, status=200)
+
+
+class VerifyCodeView(generics.GenericAPIView):
+    serializer_class = VerifyCodeSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data["email"]
+        code = serializer.validated_data["code"]
+
+        try:
+            record = EmailVerification.objects.get(email=email)
+        except EmailVerification.DoesNotExist:
+            return Response({"detail": "No verification request found."}, status=400)
+
+        if record.is_expired():
+            record.delete()
+            return Response({"detail": "Code expired."}, status=400)
+
+        if record.code != code:
+            return Response({"detail": "Invalid code."}, status=400)
+
+        user = User.objects.create(
+            username=email,
+            email=email,
+            first_name=record.first_name,
+            last_name=record.last_name,
+            password=record.password,
+        )
+
+        record.delete()
+
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+            },
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        }, status=201)

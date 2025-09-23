@@ -58,6 +58,15 @@ export default function Listings() {
                         {user?.profile.reviews_count} reviews
                         </a>
                     </div>
+                    <div className="lg:hidden block py-4">
+                      <Link href={"/new"}>
+                        <button className="w-full p-4 bg-blue-500 rounded-2xl cursor-pointer hover:bg-green-500 transition ">Place an ad</button>
+                      </Link>
+                      <Link href={"/profile/edit"}>
+                        <button className="w-full mt-2 p-4 bg-[#36B731] rounded-2xl cursor-pointer hover:bg-green-500 transition ">Edit profile</button>
+                      </Link>
+                    </div>
+
                     </div>
 
                 </div>
@@ -67,7 +76,7 @@ export default function Listings() {
                     <Link href="/listings"><span className="text-[#2AAEF7] text-md h-12">My Listings</span> </Link>
                     <Link href="/favorites"><span className="text-[#2AAEF7] text-md h-12">Favorites</span></Link>
                     <Link href="/messages"><span className="text-[#2AAEF7] text-md h-12">Messages</span></Link>
-                    <Link href="/reviews"><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
+                    <Link href={`/reviews/${user?.profile.id}`}><span className="text-[#2AAEF7] text-md h-12">My Reviews</span> </Link>
                 </div>
                 <div className="py-3 flex flex-col border-b border-gray-300">
                     <Link aria-disabled href=""><span className="text-[#2AAEF7] text-md h-12">Wallet (Soon)</span> </Link>
