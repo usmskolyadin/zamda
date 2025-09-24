@@ -301,7 +301,7 @@ class RegisterRequestView(generics.GenericAPIView):
         )
 
         send_mail(
-            subject="ZAMDA - Confirm your registration",
+            subject="ZAMDA - Confirm your registration to contuniue",
             message=f"Your verification code: {code}",
             from_email="support@zamda.net",
             recipient_list=[data["email"]],
