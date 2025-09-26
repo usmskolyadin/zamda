@@ -300,12 +300,19 @@ class RegisterRequestView(generics.GenericAPIView):
             },
         )
 
-        send_mail(
-            subject="ZAMDA - Confirm your registration",
-            message=f"Your verification code: {code}",
+        from sendgrid import SendGridAPIClient
+        from sendgrid.helpers.mail import Mail
+        import os
+
+        message = Mail(
             from_email="support@zamda.net",
-            recipient_list=[data["email"]],
+            to_emails=data["email"],
+            subject="ZAMDA - Confirm your registration",
+            html_content=f"Your verification code: {code}"
         )
+
+        sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+        response = sg.send(message)
 
         return Response({"detail": "Verification code sent to email."}, status=200)
 
