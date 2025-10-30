@@ -10,6 +10,14 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true, 
   },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /leaflet\/.*\.(png|jpg|jpeg|gif|svg)$/,
+      type: "asset/resource",
+    });
+
+    return config;
+  },
 };
 
 export default nextConfig;
