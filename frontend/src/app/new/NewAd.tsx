@@ -260,7 +260,7 @@ const handleSubmit = async (e: FormEvent) => {
             >
               <option value="">Select subcategory</option>
               {subcategories.map((sub) => (
-                <option key={sub.id} value={sub.id}>
+                <option key={sub.id} value={sub.slug}>
                   {sub.name}
                 </option>
               ))}
