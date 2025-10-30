@@ -1,16 +1,13 @@
 FROM node:20-bullseye AS builder
 
 WORKDIR /app
-
 RUN apt-get update && \
-    apt-get install -y git libvips-dev build-essential && \
+    apt-get install -y libvips-dev build-essential && \
     rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
 
-RUN npm install --legacy-peer-deps
-
-RUN npm install --arch=x64 --platform=linux sharp
+RUN npm install --legacy-peer-deps --include=optional
 
 COPY . .
 
@@ -20,7 +17,6 @@ FROM node:20-bullseye AS runner
 
 WORKDIR /app
 ENV NODE_ENV=production
-
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
