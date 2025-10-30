@@ -8,9 +8,9 @@ interface PaginatedResponse<T> {
   results: T[];
 }
 
-export async function getSubCategories(categoryId: number): Promise<SubCategory[]> {
+export async function getSubCategories(slug: string): Promise<SubCategory[]> {
   const data = await apiFetch<PaginatedResponse<SubCategory>>(
-    `/api/subcategories/?category=${categoryId}`
+    `/api/subcategories/?category=${slug}`
   );
   return data.results;
 }

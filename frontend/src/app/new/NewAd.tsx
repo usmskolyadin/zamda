@@ -8,6 +8,8 @@ import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 import { useMapEvents } from 'react-leaflet';
 import { API_URL, apiFetch } from '@/src/shared/api/base';
+import { ChevronDown } from "lucide-react";
+import ImageUploader from '@/src/widgets/image-uploader/ImageUploader';
 
 
 interface MapClickProps {
@@ -42,8 +44,8 @@ const MapClickHandler = dynamic(
 );
 
 
-interface Category { id: number; name: string; }
-interface SubCategory { id: number; name: string; }
+interface Category { id: number; name: string; slug: string }
+interface SubCategory { id: number; name: string; slug: string }
 interface ExtraField { id: number; name: string; key: string; field_type: string; }
 
 export default function NewAd() {
@@ -59,11 +61,12 @@ export default function NewAd() {
   const [price, setPrice] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [location, setLocation] = useState<string>('');
-  const [latLng, setLatLng] = useState<LatLngExpression>([51.505, -0.09]);
+  const [latLng, setLatLng] = useState<LatLngExpression>([38.5816, -121.4944]);
   const [isActive, setIsActive] = useState<boolean>(true);
-  const [images, setImages] = useState<FileList | null>(null);
+  const [images, setImages] = useState<File[]>([]);
   const [extraValues, setExtraValues] = useState<{ [key: string]: string }>({});
-
+  const [locationInput, setLocationInput] = useState<string>('');
+  const [suggestions, setSuggestions] = useState<any[]>([]); 
   const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -133,67 +136,53 @@ const handleMapClick = async (lat: number, lng: number) => {
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,
-      {
-        headers: {
-          'User-Agent': 'my-nextjs-app',
-        },
-      }
+      { headers: { 'User-Agent': 'my-nextjs-app' } }
     );
-
     if (!res.ok) return;
 
     const data: any = await res.json();
-
     if (data.address) {
       const { city, town, village, road, house_number } = data.address;
-
-      const cityName = city || town || village || '';
-      const street = road || '';
-      const house = house_number || '';
-
-      const formatted = [cityName, street, house].filter(Boolean).join(', ');
+      const formatted = [city || town || village, road, house_number].filter(Boolean).join(', ');
       setLocation(formatted);
+      setLocationInput(formatted); // синхронизируем input с картой
+      setSuggestions([]); // очищаем подсказки
     }
   } catch (err) {
     console.error('Geocoding error:', err);
   }
 };
+
 const handleLocationChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   const value = e.target.value;
-  setLocation(value);
+  setLocationInput(value);
 
-  if (value.length < 3) return;
+  if (value.length < 3) {
+    setSuggestions([]);
+    return;
+  }
 
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value)}&addressdetails=1&limit=5`,
-      {
-        headers: { 'User-Agent': 'my-nextjs-app' },
-      }
+      { headers: { 'User-Agent': 'my-nextjs-app' } }
     );
-
     if (!res.ok) return;
 
     const data: any[] = await res.json();
-    if (data && data.length > 0) {
-      const { lat, lon, address } = data[0];
-
-      setLatLng([parseFloat(lat), parseFloat(lon)]);
-
-      if (address) {
-        const { city, town, village, road, house_number } = address;
-        const cityName = city || town || village || '';
-        const street = road || '';
-        const house = house_number || '';
-        const formatted = [cityName, street, house].filter(Boolean).join(', ');
-        setLocation(formatted);
-      }
-    }
+    setSuggestions(data);
   } catch (err) {
     console.error('Geocoding error:', err);
   }
 };
 
+const handleSuggestionClick = (suggestion: any) => {
+  const { lat, lon, display_name } = suggestion;
+  setLatLng([parseFloat(lat), parseFloat(lon)]);
+  setLocation(display_name);
+  setLocationInput(display_name);
+  setSuggestions([]);
+};
 
 const handleSubmit = async (e: FormEvent) => {
   e.preventDefault();
@@ -206,7 +195,7 @@ const handleSubmit = async (e: FormEvent) => {
   formData.append('subcategory_id', selectedSubcategory); 
   formData.append('is_active', String(isActive));
   formData.append('extra', JSON.stringify(extraValues));
-  formData.append('location', location); 
+  formData.append('location', locationInput || location);
   console.log('selectedSubcategory:', selectedSubcategory);
   console.log('extraValues:', extraValues);
   if (images) Array.from(images).forEach(file => formData.append('images', file));
@@ -236,36 +225,38 @@ const handleSubmit = async (e: FormEvent) => {
     </div>
   </section>
 
-  <section className="bg-white pb-16 px-4 h-screen overflow-auto">
-    <div className="text-black max-w-screen-xl mx-auto">
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col items-center justify-center w-full gap-6"
-      >
-        <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
+<section className="bg-white min-h-screen flex  justify-center px-4">
+  <div className="text-black w-full max-w-screen-xl">
+    <form
+      onSubmit={handleSubmit}
+      className="grid grid-cols-2 gap-4 w-full max-w-3xl mx-auto"
+    >
+        <label className="w-full max-w-md relative flex-col flex font-semibold text-gray-800">
           <p className="font-semibold text-black text-xl">Category</p>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="p-4 border border-black rounded-3xl h-[55px] mt-1 text-gray-900"
+            className="p-4 pr-10 border border-black rounded-3xl h-[55px] mt-1 text-gray-900 appearance-none w-full"
             required
           >
             <option value="">Select category</option>
             {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
+              <option key={cat.id} value={cat.slug}>
                 {cat.name}
               </option>
             ))}
           </select>
+          <ChevronDown className="absolute right-4 top-1/2 mt-1 w-5 pointer-events-none text-gray-900" />
         </label>
 
         {selectedCategory && (
-          <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
+
+        <label className="w-full max-w-md relative flex-col flex font-semibold text-gray-800">
             <p className="font-semibold text-black text-xl">Subcategory</p>
             <select
               value={selectedSubcategory}
               onChange={(e) => setSelectedSubcategory(e.target.value)}
-              className="p-4 border border-black rounded-3xl h-[55px] mt-1 text-gray-900"
+              className="p-4 pr-10 border border-black rounded-3xl h-[55px] mt-1 text-gray-900 appearance-none w-full"
               required
             >
               <option value="">Select subcategory</option>
@@ -275,14 +266,16 @@ const handleSubmit = async (e: FormEvent) => {
                 </option>
               ))}
             </select>
+            <ChevronDown className="absolute right-4 top-1/2 mt-1 w-5 pointer-events-none text-gray-900" />
+
           </label>
         )}
 
         {selectedSubcategory && (
           <>
             <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
-              <p className="font-semibold text-black text-xl">Title</p>
-              <p className="font-medium text-gray-900">
+              <p className="font-semibold text-black text-xl">Listing Title</p>
+              <p className="text-gray-700 text-md font-medium">
                 Minimum length 15 symbols
               </p>
               <input
@@ -299,6 +292,9 @@ const handleSubmit = async (e: FormEvent) => {
 
             <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
               <p className="font-semibold text-black text-xl">Price ($)</p>
+              <p className="text-gray-700 text-md font-medium">
+                Enter only final price
+              </p>
               <input
                 type="number"
                 placeholder="Enter price"
@@ -311,7 +307,7 @@ const handleSubmit = async (e: FormEvent) => {
 
             <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
               <p className="font-semibold text-black text-xl">Description</p>
-              <p className="font-medium text-gray-900">
+              <p className="text-gray-700 text-md font-medium">
                 Minimum length 100 symbols
               </p>
               <textarea
@@ -326,51 +322,73 @@ const handleSubmit = async (e: FormEvent) => {
               />
             </label>
 
-            <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
-              <p className="font-semibold text-black text-xl">Location</p>
-              <input
-                type="text"
-                placeholder="Enter location or select on map"
-                value={location}
-                onChange={handleLocationChange}
-                className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900 mb-2"
-                required
-              />
-            </label>
 
-            <div className="w-full max-w-md h-80 border border-black rounded-3xl overflow-hidden">
-              <MapContainer
-                center={latLng}
-                zoom={13}
-                style={{ height: "100%", width: "100%", zIndex: "10" }}
-              >
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {defaultIcon && (
-                  <Marker position={latLng} icon={defaultIcon}>
-                    <Popup>Selected location</Popup>
-                  </Marker>
-                )}
-                <MapClickHandler onClick={handleMapClick} />
-              </MapContainer>
+              <ImageUploader images={images} setImages={setImages} />
+            <div>
+
+<label className="w-full max-w-md flex-col flex font-semibold text-gray-800 relative">
+  <p className="font-semibold text-black text-xl">Location</p>
+  <p className="text-gray-700 text-md font-medium">Your full location for delivery etc.</p>
+
+  <input
+    type="text"
+    placeholder="Enter location or select on map"
+    value={locationInput}
+    onChange={handleLocationChange}
+    className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900 mb-2"
+    autoComplete="off"
+    required
+  />
+
+  {/* Список подсказок */}
+  {suggestions.length > 0 && (
+    <ul className="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-xl mt-1 z-50 max-h-60 overflow-auto shadow-lg">
+      {suggestions.map((sug, index) => (
+        <li
+          key={index}
+          className="p-2 hover:bg-gray-200 cursor-pointer text-sm"
+          onClick={() => handleSuggestionClick(sug)}
+        >
+          {sug.display_name}
+        </li>
+      ))}
+    </ul>
+  )}
+</label>
+
+<div className="w-full max-w-md z-20 h-60 border border-black rounded-3xl overflow-hidden mt-2">
+  <MapContainer center={latLng} zoom={13} style={{ height: "100%", width: "100%" }}>
+    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+    {defaultIcon && (
+      <Marker position={latLng} icon={defaultIcon}>
+        <Popup>Selected location</Popup>
+      </Marker>
+    )}
+    <MapClickHandler onClick={handleMapClick} />
+  </MapContainer>
+</div>
+
+
             </div>
-
-            <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
-              <p className="font-semibold text-black text-xl">Images</p>
-              <input
-                type="file"
-                multiple
-                onChange={(e) => setImages(e.target.files)}
-                className="p-4 border border-black rounded-3xl mt-1 text-gray-900"
-              />
-            </label>
-
+            <div>
+              
+            </div>
             <button
               type="submit"
-              className="bg-black text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition"
+              className="bg-black text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition mb-4"
+            >
+              Create Ad
+            </button>
+            
+            <button
+              type="submit"
+              className="bg-black text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition mb-4"
             >
               Create Ad
             </button>
           </>
+
+
         )}
       </form>
     </div>

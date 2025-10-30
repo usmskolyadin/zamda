@@ -159,10 +159,15 @@ if (loading) {
                         {items.map((c) => (
           <Link key={c.id} href={`/messages/${c.id}`} className="block mt-3">
             <div className="flex items-center justify-between bg-gray-100 rounded-2xl p-4 hover:bg-gray-200">
-              <div>
-                <div className="text-black font-semibold">{c.ad_title}</div>
-                <div className="text-gray-600 text-sm truncate max-w-[60ch]">
-                  {c.last ? c.last.text : "No messages yet"}
+              <div className="flex">
+                <div className="mr-4">
+                  <img src={c.seller.profile.avatar} className="rounded-full w-12 h-12" width={100} height={100} alt={""} />
+                </div>
+                <div>
+                  <div className="text-black font-semibold">{c.ad_title}</div>
+                  <div className="text-gray-600 text-sm truncate max-w-[60ch]">
+                    {c.last ? c.last.text : "No messages yet"}
+                  </div>
                 </div>
               </div>
               <div className="text-right">
