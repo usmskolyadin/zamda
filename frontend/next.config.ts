@@ -5,7 +5,10 @@ const nextConfig: NextConfig = {
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
   experimental: {
-    optimizeCss: false, // <-- отключаем LightningCSS
+    optimizeCss: false, 
+  },
+  images: {
+    unoptimized: true, 
   },
 };
 
