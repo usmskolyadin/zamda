@@ -1,4 +1,3 @@
-# ---- Builder ----
 FROM node:20-bullseye AS builder
 
 WORKDIR /app
@@ -9,7 +8,9 @@ RUN apt-get update && \
 
 COPY package*.json ./
 
-RUN npm install --legacy-peer-deps --include=optional
+RUN npm install --legacy-peer-deps
+
+RUN npm install --arch=x64 --platform=linux sharp
 
 COPY . .
 
