@@ -13,7 +13,7 @@ export async function getCategories(): Promise<Category[]> {
   return data.results;
 }
 
-export async function getCategoryById(id: number): Promise<Category> {
-  const category = await apiFetch<Category>(`/api/categories/${id}/`);
+export async function getCategoryBySlug(slug: string): Promise<Category> {
+  const category = await apiFetch<Category>(`/api/categories/${slug}/`);
   return category;
 }

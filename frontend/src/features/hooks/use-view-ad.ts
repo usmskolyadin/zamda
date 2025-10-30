@@ -1,21 +1,19 @@
 "use client";
-
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/auth-context";
 import { API_URL } from "@/src/shared/api/base";
 
-export function useViewAd(adId: number) {
+export function useViewAd(adSlug?: string) {
   const [viewsCount, setViewsCount] = useState<number | null>(null);
-  const { accessToken } = useAuth();
-  
+
   useEffect(() => {
+    if (!adSlug) return;
+
     const registerView = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/ads/${adId}/view/`, {
+        const res = await fetch(`${API_URL}/api/ads/${adSlug}/view/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
           },
         });
 
@@ -31,10 +29,8 @@ export function useViewAd(adId: number) {
       }
     };
 
-    if (adId) {
-      registerView();
-    }
-  }, [adId, accessToken]);
+    registerView();
+  }, [adSlug]);
 
   return { viewsCount };
 }

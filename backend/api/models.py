@@ -1,20 +1,28 @@
+import itertools
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.text import slugify
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True)
     image = models.ImageField(upload_to="categories/", blank=True, null=True)
 
-    class Meta:
-        verbose_name_plural = "Categories"
-        ordering = ['name']
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name_plural = "Categories"
+        ordering = ['name']
 
 
 class SubCategory(models.Model):
@@ -23,12 +31,17 @@ class SubCategory(models.Model):
     slug = models.SlugField()
     image = models.ImageField(upload_to="categories/", blank=True, null=True)
 
-    class Meta:
-        unique_together = ('category', 'slug')
-        ordering = ['name']
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.category.name} → {self.name}"
+
+    class Meta:
+        unique_together = ('category', 'slug')
+        ordering = ['name']
 
 
 class ExtraFieldDefinition(models.Model):
@@ -69,6 +82,7 @@ class Advertisement(models.Model):
     subcategory = models.ForeignKey('SubCategory', related_name="ads", on_delete=models.CASCADE)
 
     title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=300, unique=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -83,6 +97,17 @@ class Advertisement(models.Model):
         through="AdvertisementLike",
         blank=True
     )
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            for i in itertools.count(1):
+                if not Advertisement.objects.filter(slug=slug).exists():
+                    break
+                slug = f"{base_slug}-{i}"
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title

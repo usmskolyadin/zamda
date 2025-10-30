@@ -88,7 +88,7 @@ export default function Header() {
               </div>
             </div>
           </header>
-          <nav className="flex lg:h-[114px] h-[140px] bg-white items-center shadow-xs p-4 ">
+          <nav className="flex lg:h-[80px] h-[140px] bg-white items-center shadow-xs p-4 ">
             <div className="max-w-screen-xl mx-auto lg:flex items-center w-full justify-between">
               <div className="flex items-center">
                 <Link href={"/"}>

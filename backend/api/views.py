@@ -37,6 +37,17 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all().order_by('name')
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    lookup_field = "slug"
+    lookup_value_regex = "[^/]+"
+
+import django_filters
+
+class SubCategoryFilter(django_filters.FilterSet):
+    category = django_filters.CharFilter(field_name="category__slug", lookup_expr="iexact")
+
+    class Meta:
+        model = SubCategory
+        fields = ["category"]
 
 class SubCategoryViewSet(viewsets.ModelViewSet):
     queryset = SubCategory.objects.select_related('category').all()
@@ -45,6 +56,10 @@ class SubCategoryViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['category']
     search_fields = ['name']
+    lookup_field = "slug"
+    lookup_value_regex = "[^/]+"
+    filterset_class = SubCategoryFilter
+
 
 class ExtraFieldDefinitionViewSet(viewsets.ModelViewSet):
     queryset = ExtraFieldDefinition.objects.select_related('subcategory').all()
@@ -54,13 +69,12 @@ class ExtraFieldDefinitionViewSet(viewsets.ModelViewSet):
     filterset_fields = ['subcategory']
     search_fields = ['name','key']
 
-import django_filters
 
 class AdvertisementFilter(FilterSet):
     price_min = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
     price_max = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
     location = django_filters.CharFilter(field_name="location", lookup_expr="icontains")
-    subcategory = django_filters.ModelChoiceFilter(queryset=SubCategory.objects.all())
+    subcategory = django_filters.CharFilter(field_name="subcategory__slug", lookup_expr="iexact")
     created_after = django_filters.DateTimeFilter(field_name="created_at", lookup_expr="gte")
     owner_username = django_filters.CharFilter(field_name="owner__username", lookup_expr="iexact")
     owner_email = django_filters.CharFilter(field_name="owner__email", lookup_expr="iexact")
@@ -81,17 +95,25 @@ class AdvertisementViewSet(viewsets.ModelViewSet):
     search_fields = ["title", "description", "owner__username", "owner__email"]
     ordering_fields = ["created_at", "price"]
     ordering = ["-created_at"]
+    
+    lookup_field = "slug" 
+    lookup_value_regex = "[^/]+"
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["request"] = self.request
         return context
-
+    
+    def retrieve(self, request, slug=None):
+        ad = self.get_object()
+        serializer = self.get_serializer(ad)
+        return Response(serializer.data)
+    
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
-    def like(self, request, pk=None):
+    def like(self, request, slug=None):
         ad = self.get_object()
         user = request.user
 
@@ -104,19 +126,26 @@ class AdvertisementViewSet(viewsets.ModelViewSet):
 
 
     @action(detail=True, methods=["post"], permission_classes=[AllowAny])
-    def view(self, request, pk=None):
+    def view(self, request, slug=None):
         ad = self.get_object()
-
-        ip = request.META.get("REMOTE_ADDR")
         user = request.user if request.user.is_authenticated else None
+        ip = request.META.get("REMOTE_ADDR")
 
         try:
-            AdvertisementView.objects.create(ad=ad, user=user, ip_address=ip)
-            ad.views_count += 1
-            ad.save(update_fields=["views_count"])
-            return Response({"detail": "View counted", "views_count": ad.views_count})
+            if user:
+                obj, created = AdvertisementView.objects.get_or_create(ad=ad, user=user)
+                if created:
+                    ad.views_count += 1
+                    ad.save(update_fields=["views_count"])
+            else:
+                obj, created = AdvertisementView.objects.get_or_create(ad=ad, ip_address=ip, user=None)
+                if created:
+                    ad.views_count += 1
+                    ad.save(update_fields=["views_count"])
         except IntegrityError:
-            return Response({"detail": "Already viewed", "views_count": ad.views_count})
+            pass
+
+        return Response({"detail": "View counted", "views_count": ad.views_count})
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
