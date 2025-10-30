@@ -191,7 +191,7 @@ const handleSubmit = async (e: FormEvent) => {
   formData.append('title', title);
   formData.append('price', price);
   formData.append('description', description);
-  formData.append('subcategory_id', selectedSubcategory); 
+  formData.append('subcategory_slug', selectedSubcategory); 
   formData.append('is_active', String(isActive));
   formData.append('extra', JSON.stringify(extraValues));
   formData.append('location', locationInput || location);
