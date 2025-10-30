@@ -140,17 +140,17 @@ class AdvertisementSerializer(serializers.ModelSerializer):
         write_only=True,
         source='subcategory'
     )
-    subcategory_id = serializers.PrimaryKeyRelatedField(
-        queryset=SubCategory.objects.all(),
-        write_only=True,
-        source='subcategory'
-    )
+    # subcategory_id = serializers.PrimaryKeyRelatedField(
+    #     queryset=SubCategory.objects.all(),
+    #     write_only=True,
+    #     source='subcategory'
+    # )
     owner_profile_id = serializers.IntegerField(source="owner.profile.id", read_only=True)
     category_slug = serializers.CharField(source="subcategory.category.slug", read_only=True)
 
     class Meta:
         model = Advertisement
-        fields = ('id','owner','subcategory', 'subcategory_slug', 'category_slug', 'slug', 'title','price','description','images', 'subcategory_id',
+        fields = ('id','owner','subcategory', 'subcategory_slug', 'category_slug', 'slug', 'title','price','description','images',
                   'created_at','is_active','extra_values','extra', 'owner_profile_id', "views_count",
                    "likes_count", "is_liked", "location")
         read_only_fields = ('created_at','owner','extra_values')
