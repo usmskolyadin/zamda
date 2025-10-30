@@ -2,13 +2,14 @@ import { NextConfig } from "next";
 
 const nextConfig = {
   reactStrictMode: true,
-  typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
   experimental: {
     optimizeCss: false,
   },
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+  webpack: (config) => {
+    config.resolve.alias['lightningcss'] = false;
+    return config;
   },
 };
 
