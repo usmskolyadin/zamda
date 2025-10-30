@@ -3,22 +3,27 @@ FROM node:20-bullseye AS builder
 
 WORKDIR /app
 
-# Устанавливаем git (иногда нужен для зависимостей)
-RUN apt-get update && apt-get install -y git python3 build-essential && rm -rf /var/lib/apt/lists/*
+# Устанавливаем system deps (важно: без них не пересоберутся нативные зависимости)
+RUN apt-get update && apt-get install -y git python3 make g++ && rm -rf /var/lib/apt/lists/*
 
-# Копируем package.json и устанавливаем зависимости
+# Копируем package.json
 COPY package*.json ./
+
+# Устанавливаем зависимости
 RUN npm install --legacy-peer-deps
 
-# Копируем остальной код
+# Копируем остальной проект
 COPY . .
 
-# Отключаем LightningCSS (он ломается в контейнере)
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_ENV=production
-ENV NEXT_DISABLE_LIGHTNINGCSS=1
+# 🔥 Ключевой момент — удаляем lightningcss после установки
+RUN npm uninstall lightningcss || true
 
-# Строим проект
+# 🔥 Принудительно выключаем его через env
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_DISABLE_LIGHTNINGCSS=1
+ENV NODE_ENV=production
+
+# Сборка проекта
 RUN npm run build
 
 # ===== RUNNER =====
@@ -28,7 +33,6 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_DISABLE_LIGHTNINGCSS=1
 
-# Копируем нужные файлы
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
