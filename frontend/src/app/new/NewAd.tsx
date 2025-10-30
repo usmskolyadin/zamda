@@ -5,30 +5,13 @@ import { apiFetchAuth } from "@/src/shared/api/auth.client";
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, FormEvent } from 'react';
 import dynamic from 'next/dynamic';
-import L from "leaflet";
-
 import 'leaflet/dist/leaflet.css';
 
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "/leaflet/marker-icon-2x.png",
-  iconUrl: "/leaflet/marker-icon.png",
-  shadowUrl: "/leaflet/marker-shadow.png",
-});
-
-import { useMapEvents } from 'react-leaflet';
 import { API_URL, apiFetch } from '@/src/shared/api/base';
 import { ChevronDown } from "lucide-react";
 import ImageUploader from '@/src/widgets/image-uploader/ImageUploader';
-
-
-interface MapClickProps {
-  onClick: (lat: number, lng: number) => void;
-}
-
-
-type LatLngExpression = [number, number];
+import { LatLngExpression } from 'leaflet';
+import Link from 'next/link';
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then(mod => mod.MapContainer),
@@ -341,60 +324,57 @@ const handleSubmit = async (e: FormEvent) => {
 
               <ImageUploader images={images} setImages={setImages} />
             <div>
+              <label className="w-full max-w-md flex-col flex font-semibold text-gray-800 relative">
+                <p className="font-semibold text-black text-xl">Location</p>
+                <p className="text-gray-700 text-md font-medium">Your full location for delivery etc.</p>
 
-<label className="w-full max-w-md flex-col flex font-semibold text-gray-800 relative">
-  <p className="font-semibold text-black text-xl">Location</p>
-  <p className="text-gray-700 text-md font-medium">Your full location for delivery etc.</p>
+                <input
+                  type="text"
+                  placeholder="Enter location or select on map"
+                  value={locationInput}
+                  onChange={handleLocationChange}
+                  className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900 mb-2"
+                  autoComplete="off"
+                  required
+                />
 
-  <input
-    type="text"
-    placeholder="Enter location or select on map"
-    value={locationInput}
-    onChange={handleLocationChange}
-    className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900 mb-2"
-    autoComplete="off"
-    required
-  />
+                {suggestions.length > 0 && (
+                  <ul className="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-xl mt-1 z-50 max-h-60 overflow-auto shadow-lg">
+                    {suggestions.map((sug, index) => (
+                      <li
+                        key={index}
+                        className="p-2 hover:bg-gray-200 cursor-pointer text-sm"
+                        onClick={() => handleSuggestionClick(sug)}
+                      >
+                        {sug.display_name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </label>
 
-  {/* Список подсказок */}
-  {suggestions.length > 0 && (
-    <ul className="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-xl mt-1 z-50 max-h-60 overflow-auto shadow-lg">
-      {suggestions.map((sug, index) => (
-        <li
-          key={index}
-          className="p-2 hover:bg-gray-200 cursor-pointer text-sm"
-          onClick={() => handleSuggestionClick(sug)}
-        >
-          {sug.display_name}
-        </li>
-      ))}
-    </ul>
-  )}
-</label>
-
-<div className="w-full max-w-md z-20 h-60 border border-black rounded-3xl overflow-hidden mt-2">
-  <MapContainer center={latLng} zoom={13} style={{ height: "100%", width: "100%" }}>
-    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-    {defaultIcon && (
-      <Marker position={latLng} icon={defaultIcon}>
-        <Popup>Selected location</Popup>
-      </Marker>
-    )}
-    <MapClickHandler onClick={handleMapClick} />
-  </MapContainer>
-</div>
-
-
+              <div className="w-full max-w-md z-20 h-60 border border-black rounded-3xl overflow-hidden mt-2">
+                <MapContainer center={latLng} zoom={13} style={{ height: "100%", width: "100%" }}>
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  {defaultIcon && (
+                    <Marker position={latLng} icon={defaultIcon}>
+                      <Popup>Selected location</Popup>
+                    </Marker>
+                  )}
+                  <MapClickHandler onClick={handleMapClick} />
+                </MapContainer>
+              </div>
             </div>
             <div>
-              
             </div>
-            <button
-              type="submit"
-              className="bg-black text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition mb-4"
-            >
-              Create Ad
-            </button>
+            <Link href={'/listings'}>
+              <button
+                type="submit"
+                className="bg-black/50 text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition mb-4"
+              >
+                Back
+              </button>
+            </Link>
             
             <button
               type="submit"
@@ -403,13 +383,10 @@ const handleSubmit = async (e: FormEvent) => {
               Create Ad
             </button>
           </>
-
-
         )}
       </form>
     </div>
   </section>
 </div>
-
   );
 }
