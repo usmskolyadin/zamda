@@ -12,43 +12,49 @@ const tabs = [
 ];
 
 export default function TabsExample() {
-  const [activeTab, setActiveTab] = useState("favorites");
+  const [activeTab, setActiveTab] = useState("recommendations");
   const [ads, setAds] = useState<Advertisement[]>([]);
   const [loading, setLoading] = useState(false);
 
-useEffect(() => {
-  if (activeTab === "favorites") {
+  const fetchAds = async (tabId: string) => {
     setLoading(true);
-    apiFetch<any>("/api/ads/")
-      .then((data) => {
-        console.log("ADS RESPONSE:", data);  
-        setAds(data.results || data);        
-      })
-      .catch((err) => console.error("API error:", err))
-      .finally(() => setLoading(false));
-  }
-}, [activeTab]);
+    try {
+      let url = "/api/ads/";
+      if (tabId === "favorites") url = "/api/ads/?filter=favorites";
+      if (tabId === "recent") url = "/api/ads/?filter=recent";
+      if (tabId === "recommendations") url = "/api/ads/?filter=recommendations";
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case "recommendations":
-        return <p>Here are your recommendations.</p>;
-      case "favorites":
-        if (loading) return <p>Loading...</p>;
-        if (!ads.length) return <p>No ads found.</p>;
-        return (
-          <div className="grid lg:grid-cols-4 grid-cols-1 gap-4 mt-6">
-            {ads.map((ad: Advertisement) => (
-              <ProductCard key={ad.id} ad={ad} />
-            ))}
-          </div>
-        );
-      case "recent":
-        return <p>You recently viewed these items.</p>;
-      default:
-        return null;
+      const data = await apiFetch<any>(url);
+      console.log(data.results || data);
+
+      setAds(data.results || data);
+    } catch (err) {
+      console.error("API error:", err);
+      setAds([]);
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchAds(activeTab);
+  }, [activeTab]);
+
+  const renderContent = () => {
+    if (loading) return <p>Loading...</p>;
+    if (!ads.length) return <p>No ads found.</p>;
+
+    return (
+      <div className="grid lg:grid-cols-4 grid-cols-1 gap-4 mt-6">
+        {ads.map((ad: Advertisement) => (
+          <ProductCard key={ad.id} ad={ad} />
+        ))}
+      </div>
+    );
+  };
+  {loading
+    ? Array.from({ length: 4 }).map((_, i) => <ProductCard key={i} loading />)
+    : ads.map(ad => <ProductCard key={ad.id} ad={ad} />)}
 
   return (
     <div className="max-w-screen-xl mx-auto py-6 flex flex-col justify-center items-center">

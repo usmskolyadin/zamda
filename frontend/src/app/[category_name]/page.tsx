@@ -3,18 +3,18 @@ import Link from "next/link";
 import { getSubCategories } from "@/src/entities/sub-category/api/get-subcategories";
 import { SubCategory } from "@/src/entities/sub-category/model/types";
 import { Category } from "@/src/entities/category/model/types";
-import { getCategoryById } from "@/src/entities/category/api/get-categories";
+import { getCategoryBySlug } from "@/src/entities/category/api/get-categories";
 
 interface Props {
   params: { category_name: string };
 }
 
 export default async function SubCategoriesPage({ params }: Props) {
-  const categoryId = Number(params.category_name);
+  const categorySlug = params.category_name;
 
-  const category: Category = await getCategoryById(categoryId);
+  const category: Category = await getCategoryBySlug(categorySlug);
 
-  const subcategories: SubCategory[] = await getSubCategories(categoryId);
+  const subcategories: SubCategory[] = await getSubCategories(categorySlug);
 
   return (
     <div className="w-full">
@@ -28,7 +28,7 @@ export default async function SubCategoriesPage({ params }: Props) {
           </h1>
           <div className="grid lg:grid-cols-2 lg:grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-4">
             {subcategories.map((subcategory) => (
-              <Link key={subcategory.id} href={`/${category.id}/${subcategory.id}`}>
+              <Link key={subcategory.id} href={`/${category.slug}/${subcategory.slug}`}>
                 <div className="bg-[#F2F1F0] hover:opacity-70 transition h-[169px] rounded-2xl flex items-center justify-between">
                   <h2 className="font-semibold  p-4 text-black text-xl lg:max-w-[50%]">
                     {subcategory.name}

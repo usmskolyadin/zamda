@@ -16,10 +16,13 @@ export interface SubCategory {
 export interface Advertisement {
   id: number;
   title: string;
+  slug: string;
+  subcategory_slug: string;
   description: string;
   price: string;
   created_at: string;
   is_active: boolean;
+  category_slug: string
   location: string;
   images: { id: number; image: string }[];
   owner: {

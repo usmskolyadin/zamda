@@ -4,6 +4,7 @@ import { getSubCategories } from "@/src/entities/sub-category/api/get-subcategor
 import Filters from "@/src/widgets/filters";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { FaArrowRight, FaStar } from "react-icons/fa";
 
 
@@ -12,17 +13,17 @@ interface Props {
 }
 
 export default async function AdsBySubcategory({ params }: Props) {
-  const subcategories = await getSubCategories(Number(params.category_name));
+  const subcategories = await getSubCategories(params.category_name);
 
   const subcategory = subcategories.find(
-    (s) => s.id === Number(params.subcategory_name)
+    (sub) => sub.slug === params.subcategory_name
   );
-
+  
   if (!subcategory) {
-    throw new Error("Подкатегория не найдена");
+    notFound();
   }
 
-  const ads = await getAdsBySubcategory(Number(subcategory.id));
+  const ads = await getAdsBySubcategory(subcategory.slug);
 
   return (
     <div className=" w-full">
@@ -109,7 +110,7 @@ export default async function AdsBySubcategory({ params }: Props) {
                       <div className="lg:w-2/3 lg:pl-4 lg:mt-0 mt-2 flex flex-col justify-between">
                         <Link
                           key={ad.id}
-                          href={`/${params.category_name}/${params.subcategory_name}/${ad.id}`}
+                          href={`/${params.category_name}/${params.subcategory_name}/${ad.slug}`}
                         >
                        <div>
                           <h3 className="lg:text-xl text-2xl font-bold text-[#2AAEF7]">

@@ -24,7 +24,7 @@ export default async function Home() {
   const cards = categories.map((cat, index) => ({
     title: cat.name, 
     image: cat.image || "/car.png",
-    href: `/${cat.id}`, 
+    href: `/${cat.slug}`, 
     bg: bgColors[index % bgColors.length],
   }));
 

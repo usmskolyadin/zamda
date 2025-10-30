@@ -1,46 +1,62 @@
 "use client";
 
 import { API_URL } from "@/src/shared/api/base";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import useSWR from "swr";
 
-interface UseLikeAdProps {
-  adId: number;
-  initialIsLiked: boolean;
-  initialLikesCount: number;
-  token: string | null;
-}
+export function useLikeAd(adSlug: string | undefined, token: string | null) {
+  const fetcher = (url: string) =>
+    fetch(url, { headers: { Authorization: `Bearer ${token}` } }).then(res => res.json());
 
-export function useLikeAd({ adId, initialIsLiked, initialLikesCount, token }: UseLikeAdProps) {
-  const [isLiked, setIsLiked] = useState(initialIsLiked);
-  const [likesCount, setLikesCount] = useState(initialLikesCount);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  // SWR ключ null, если adSlug отсутствует или пользователь не залогинен
+  const { data, mutate, isLoading } = useSWR(
+    adSlug && token ? `${API_URL}/api/ads/${adSlug}/` : null,
+    fetcher,
+    { revalidateOnFocus: false }
+  );
 
   const toggleLike = async () => {
-    if (!token) {
-      router.push("/login");
-      alert("You must be logged in to like ads.");
-      return;
-    }
+    if (!token || !adSlug) return;
 
-    setLoading(true);
+    if (!data) return; // защита от undefined
+
+    // оптимистическое обновление
+    mutate(
+      {
+        ...data,
+        is_liked: !data.is_liked,
+        likes_count: data.likes_count + (data.is_liked ? -1 : 1),
+      },
+      false
+    );
+
     try {
-      const res = await fetch(`${API_URL}api/ads/${adId}/like/`, {
+      const res = await fetch(`${API_URL}/api/ads/${adSlug}/like/`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error(await res.text());
-      const data = await res.json();
 
-      setIsLiked(data.detail === "Liked");
-      setLikesCount(data.likes_count);
+      const updated = await res.json();
+
+      // обновляем с сервера
+      mutate(
+        {
+          ...data,
+          is_liked: updated.detail === "Liked",
+          likes_count: updated.likes_count,
+        },
+        false
+      );
     } catch (err) {
-      console.error("Failed to like:", err);
-    } finally {
-      setLoading(false);
+      console.error("Failed to like ad:", err);
+      // откат в случае ошибки
+      mutate(data, false);
     }
   };
 
-  return { isLiked, likesCount, loading, toggleLike };
+  return {
+    isLiked: data?.is_liked,
+    likesCount: data?.likes_count,
+    toggleLike,
+    loading: isLoading,
+  };
 }

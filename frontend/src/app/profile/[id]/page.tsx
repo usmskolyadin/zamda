@@ -80,9 +80,7 @@ useEffect(() => {
                   </svg>
                   {profile.city} 
                 </p>
-                <h2 className="text-gray-800 font-medium text-md">
-                  {profile.username}
-                </h2>
+
               </div>
 
               <div className="flex items-center text-sm text-gray-700">
@@ -113,7 +111,7 @@ useEffect(() => {
 
             <div className="flex flex-col">
               {ads.map((ad) => (
-                <Link key={ad.id} href={`/${ad.subcategory.category.id}/${ad.subcategory.id}/${ad.id}`}>
+                <Link key={ad.id} href={`/${ad.subcategory.slug}/${ad.subcategory.slug}/${ad.slug}`}>
                   <div className="lg:flex mt-4 min-w-full bg-gray-100 rounded-2xl lg:p-2 p-3">
                     <div className="mr-4">
                       <img

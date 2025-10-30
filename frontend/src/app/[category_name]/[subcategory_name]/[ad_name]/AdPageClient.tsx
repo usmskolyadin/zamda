@@ -15,14 +15,20 @@ export default function AdPageClient({ ad }: { ad: Advertisement }) {
   const [loading, setLoading] = useState(false);
   const { accessToken } = useAuth();
 
-  const { isLiked, likesCount, toggleLike } = useLikeAd({
-    adId: ad.id,
-    initialIsLiked: ad.is_liked,
-    initialLikesCount: ad.likes_count,
-    token: accessToken,
-  });
+  const { isLiked, likesCount, toggleLike } = useLikeAd(ad.slug, accessToken);
 
-  const { viewsCount } = useViewAd(ad.id);
+  const { viewsCount } = useViewAd(ad.slug);
+
+  useEffect(() => {
+    setLoading(true);
+    apiFetch<any>("/api/ads/")
+      .then((data) => {
+        setAds(data.results || data);
+      })
+      .catch((err) => console.error("API error:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
 
   useEffect(() => {
     setLoading(true);
@@ -40,7 +46,7 @@ export default function AdPageClient({ ad }: { ad: Advertisement }) {
         <div className="max-w-screen-xl mx-auto">
           <p className="text-gray-500 pb-2">
             <Link href="/">Home</Link> /{" "}
-            <Link href="/">{ad.subcategory.category.name}</Link> /{" "}
+            <Link href="/">{ad.category_slug}</Link> {" "}
             <Link href="/">{ad.subcategory.name}</Link> / {ad.title}
           </p>
           <div className="lg:flex">
@@ -59,20 +65,20 @@ export default function AdPageClient({ ad }: { ad: Advertisement }) {
           <div className="lg:w-2/3">
             <AdSlider ad={ad} />
             <div className="mt-8">
-              <h1 className="text-2xl font-bold text-black mt-2 mb-2">
+              <h1 className="text-xl font-semibold text-black mt-2 mb-2">
                 Location
               </h1>
               <p className="text-black lg:w-2/3">{ad.location}</p>
 
-              <h1 className="text-2xl font-bold text-black mt-2 mb-2">
+              <h1 className="text-xl font-semibold text-black mt-2 mb-2">
                 Description
               </h1>
               <p className="text-black lg:w-2/3 break-words overflow-hidden">{ad.description}</p>
 
-              <h1 className="text-2xl font-bold text-black mt-6 mb-2">
-                {">"} Similar Listings in category {ad.subcategory.category.name}
+              <h1 className="text-2xl font-bold text-black mt-24 mb-2">
+                Similar Listings
               </h1>
-              <div className="grid gap-3 lg:grid-cols-2 grid-cols-1 mt-4 lg:mr-36">
+              <div className="grid gap-3 lg:grid-cols-3 grid-cols-1 mt-4 lg:mr-36">
                 {ads.map((similarAd: Advertisement) => (
                   <ProductCard key={similarAd.id} ad={similarAd} />
                 ))}
