@@ -1,11 +1,14 @@
 import { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   reactStrictMode: true,
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
   experimental: {
-    optimizeCss: false, 
+    optimizeCss: false,
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
 };
 
