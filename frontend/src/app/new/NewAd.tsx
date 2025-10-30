@@ -5,7 +5,18 @@ import { apiFetchAuth } from "@/src/shared/api/auth.client";
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, FormEvent } from 'react';
 import dynamic from 'next/dynamic';
+import L from "leaflet";
+
 import 'leaflet/dist/leaflet.css';
+
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "/leaflet/marker-icon-2x.png",
+  iconUrl: "/leaflet/marker-icon.png",
+  shadowUrl: "/leaflet/marker-shadow.png",
+});
+
 import { useMapEvents } from 'react-leaflet';
 import { API_URL, apiFetch } from '@/src/shared/api/base';
 import { ChevronDown } from "lucide-react";
@@ -69,21 +80,26 @@ export default function NewAd() {
   const [suggestions, setSuggestions] = useState<any[]>([]); 
   const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-    (async () => {
-        const L = await import('leaflet');
-        const iconUrl = (await import('leaflet/dist/images/marker-icon.png')).default;
-        const iconShadowUrl = (await import('leaflet/dist/images/marker-shadow.png')).default;
+useEffect(() => {
+  (async () => {
+    const L = await import('leaflet');
 
-        setDefaultIcon(
-        L.icon({
-            iconUrl,
-            shadowUrl: iconShadowUrl,
-            iconAnchor: [12, 41],
-        })
-        );
-    })();
-    }, []);
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
+
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: "/leaflet/marker-icon-2x.png",
+      iconUrl: "/leaflet/marker-icon.png",
+      shadowUrl: "/leaflet/marker-shadow.png",
+    });
+
+    setDefaultIcon(L.icon({
+      iconUrl: "/leaflet/marker-icon.png",
+      shadowUrl: "/leaflet/marker-shadow.png",
+      iconAnchor: [12, 41],
+    }));
+  })();
+}, []);
+
 
 useEffect(() => {
   if (typeof window === "undefined") return; 
