@@ -46,7 +46,7 @@ export default function AdActions({ ad }: AdPageProps) {
       {isOwner ? (
         <>
           <Link
-            href={`/edit/${ad.id}`}
+            href={`/edit/${ad.slug}`}
             className="w-full p-4 mb-2 bg-[#36B731] hover:bg-green-500 transition text-white rounded-2xl text-center"
           >
             Edit
