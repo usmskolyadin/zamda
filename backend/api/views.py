@@ -146,7 +146,23 @@ class AdvertisementViewSet(viewsets.ModelViewSet):
             pass
 
         return Response({"detail": "View counted", "views_count": ad.views_count})
+    
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
+    def liked(self, request):
+        """Возвращает все объявления, лайкнутые текущим пользователем."""
+        user = request.user
+        liked_ads = Advertisement.objects.filter(likes=user).select_related(
+            "owner", "subcategory__category"
+        ).prefetch_related("likes", "extra_values__field_definition", "images")
 
+        page = self.paginate_queryset(liked_ads)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(liked_ads, many=True)
+        return Response(serializer.data)
+    
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]

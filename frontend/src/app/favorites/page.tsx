@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -7,29 +7,45 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/src/features/context/auth-context";
 import { Advertisement } from "@/src/entities/advertisment/model/types";
 import { apiFetch } from "@/src/shared/api/base";
+import { apiFetchAuth } from "@/src/shared/api/auth.client";
 
-export default function Listings() {
-  const [activeTab, setActiveTab] = useState("active");
+export default function Favorites() {
   const { user } = useAuth();
   const [adsCount, setAdsCount] = useState(0);
-  const [ads, setAds] = useState<Advertisement[]>([]);  
+  const [ads, setAds] = useState<Advertisement[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
+  useEffect(() => {
     if (!user) return;
 
-    const fetchAds = async () => {
-        const query = `owner_username=${user.username}`; 
-        const res = await apiFetch<{ results: Advertisement[] }>(`/api/ads/?${query}`);
-        setAds(res.results);
-        setAdsCount(res.results.length);
+    const fetchLikedAds = async () => {
+      try {
+        setIsLoading(true);
+        const res = await apiFetchAuth<{ results?: Advertisement[] }>(`/api/ads/liked/`);
+        const adsData = res.results ?? (Array.isArray(res) ? res : []);
+        setAds(adsData);
+        setAdsCount(adsData.length);
+      } catch (error) {
+        console.error("Ошибка при загрузке избранных:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    fetchAds();
-    }, [user]);
+
+    fetchLikedAds();
+  }, [user]);
+
+  if (!user) {
+    return (
+      <div className="text-center text-gray-700 p-10">
+        <h2 className="text-2xl font-bold">Пожалуйста, войдите в аккаунт</h2>
+      </div>
+    );
+  }
 
   return (
-    <div className=" w-full">
-      <section className="bg-[#ffffff]  pb-16 p-4">
-        
+    <div className="w-full">
+      <section className="bg-white pb-16 p-4">
         <div className="max-w-screen-xl lg:flex mx-auto">
           <div className="lg:w-1/4">
             <div className="max-w-[712px]">
@@ -43,7 +59,7 @@ export default function Listings() {
                     />
                     <div>
                     <div className="py-2">
-                        <h2 className="text-black font-bold  lg:text-2xl text-3xl ">{user?.first_name} {user?.last_name}</h2>
+                        <h2 className="text-black font-bold lg:text-2xl text-3xl ">{user?.first_name} {user?.last_name}</h2>
                         <h2 className="text-gray-800 font-medium  text-md">{user?.username}</h2>
                     </div>
                     <div className="flex items-center text-sm text-gray-700">
@@ -66,9 +82,7 @@ export default function Listings() {
                         <button className="w-full mt-2 p-4 bg-[#36B731] rounded-2xl cursor-pointer hover:bg-green-500 transition ">Edit profile</button>
                       </Link>
                     </div>
-
                     </div>
-
                 </div>
             </div>
             <div className="lg:block hidden">
@@ -90,33 +104,28 @@ export default function Listings() {
               <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
             </div>
           </div>
-          <div className=" lg:w-3/4 lg:ml-24">
-            <div className="rounded-3xl w-full bg-[#F2F1F0] h-[200px]  flex justify-center items-center">
+
+          {/* Правая колонка */}
+          <div className="lg:w-3/4 lg:ml-24">
+            <div className="rounded-3xl w-full bg-[#F2F1F0] h-[200px] flex justify-center items-center mb-6">
               <h2 className="text-[#333333] text-3xl font-bold opacity-40">Your Ad Here</h2>
             </div>
-            <div className="lg:flex">
-                <h1 className="w-2/3 text-black font-bold lg:text-4xl text-3xl lg:py-4 lg:py-1 py-4">Favorites</h1>
+
+            <div className="flex justify-between items-center mb-4">
+              <h1 className="text-black font-bold text-4xl">Favorites</h1>
+              <p className="text-gray-600">{adsCount} items</p>
             </div>
-                <div className="flex items-center cursor-pointer">
-                    <svg className="mr-2" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <g opacity="0.5">
-                            <path d="M14 10H2" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M10 14H2" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M6 18H2" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M18 6H2" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M19 10V20M19 20L22 17M19 20L16 17" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </g>
-                    </svg>
-                    <p className="text-[#333333] mr-2">Sort by</p>
-                    <svg width="17" height="10" viewBox="0 0 17 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path opacity="0.5" d="M1.45898 0.708984L8.70888 7.95889L15.9588 0.708984" stroke="#333333" strokeWidth="2"/>
-                    </svg>
-                </div>
-                <div>
-            </div>
-            <div className="flex flex-col">
+
+            {isLoading ? (
+              <p className="text-gray-500 text-center py-10">Loading favorites...</p>
+            ) : ads.length === 0 ? (
+              <p className="text-gray-500 text-center py-10">
+                У вас пока нет избранных объявлений.
+              </p>
+            ) : (
+              <div className="flex flex-col">
                 {ads.map((ad) => (
-                             <Link key={ad.id} href={`/${ad.subcategory.category.id}/${ad.subcategory.category.id}/${ad.id}`}>
+                <Link key={ad.id} href={`/${ad.category_slug}/${ad.subcategory}/${ad.slug}`}>
                     <div className="lg:flex mt-4 min-w-full hover:opacity-70 transition bg-gray-100 rounded-2xl p-2">
                         <div className="mr-4 flex-shrink-0">
                             <img
@@ -151,8 +160,6 @@ export default function Listings() {
                             <p className="text-md text-gray-600 mt-2 line-clamp-3 break-all overflow-hidden">
                                 {ad.description}
                             </p>
-
-
                             <div className="flex justify-between w-1/3 mt-2">
                             <div className="flex items-center">
                                 <svg
@@ -202,7 +209,8 @@ export default function Listings() {
 
                 </Link>
                 ))}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
