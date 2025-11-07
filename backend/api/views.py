@@ -222,22 +222,23 @@ class CurrentUserView(APIView):
 
 
 class ChatViewSet(viewsets.ModelViewSet):
-    queryset = Chat.objects.all()
+    queryset = Chat.objects.all() 
     serializer_class = ChatSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Chat.objects.filter(
             Q(buyer=self.request.user) | Q(seller=self.request.user)
-        )
+        ).prefetch_related("messages", "buyer__profile", "seller__profile")
 
     def perform_create(self, serializer):
         ad = serializer.validated_data["ad"]
         buyer = self.request.user
         seller = ad.owner
+
         if buyer == seller:
             raise ValidationError("Нельзя создать чат с самим собой")
-        
+
         chat, created = Chat.objects.get_or_create(
             ad=ad,
             buyer=buyer,
@@ -246,7 +247,24 @@ class ChatViewSet(viewsets.ModelViewSet):
         serializer.instance = chat
         if created:
             serializer.save(buyer=buyer, seller=seller)
+    
+    from django.db.models import Q
 
+    @action(detail=False, methods=["get"])
+    def unread_count(self, request):
+        count = Message.objects.filter(
+            Q(chat__buyer=request.user) | Q(chat__seller=request.user),
+            is_read=False
+        ).exclude(sender=request.user).count()
+        return Response({"unread_count": count})
+    
+    @action(detail=True, methods=["post"], url_path="mark-read")
+    def mark_read(self, request, pk=None):
+        chat = self.get_object()
+        unread = chat.messages.filter(is_read=False).exclude(sender=request.user)
+        count = unread.count()
+        unread.update(is_read=True)
+        return Response({"marked_as_read": count})
 
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
