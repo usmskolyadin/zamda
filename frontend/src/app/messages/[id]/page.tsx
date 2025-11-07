@@ -99,6 +99,13 @@ export default function Chat() {
     }
   };
 
+  useEffect(() => {
+    if (chatId && accessToken) {
+      apiFetchAuth(`/api/chats/${chatId}/mark-read/`, {
+        method: "POST",
+      }).catch(console.error);
+    }
+  }, [chatId, accessToken, messages.length]);
 
 
   if (!accessToken) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { getCategories } from "@/src/entities/category/api/get-categories";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function CategoryDropdown() {
@@ -51,7 +52,7 @@ export default function CategoryDropdown() {
                 key={index}
                 className="hover:bg-gray-100 p-2 rounded-xl text-black cursor-pointer"
               >
-                <a href={`/${category.id}`}>{category.name}</a>
+                <Link href={`/${category.slug}`}>{category.name}</Link>
               </li>
             ))}
           </ul>

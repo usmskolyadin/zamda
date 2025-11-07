@@ -13,6 +13,17 @@ export default function AdSlider({ ad }: AdSliderProps) {
   const images = ad.images.filter((img) => !!img.image);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Copy failed:", err);
+    }
+  };
 
   if (images.length === 0) return null;
 
@@ -26,7 +37,6 @@ export default function AdSlider({ ad }: AdSliderProps) {
 
   return (
     <div className="max-w-[712px] relative">
-      {/* Основное изображение */}
       <div className="relative">
         <img
           src={images[activeIndex].image}
@@ -35,12 +45,11 @@ export default function AdSlider({ ad }: AdSliderProps) {
           onClick={() => setIsFullscreen(true)}
         />
 
-        {/* Кнопка лайка */}
         <button
           onClick={toggleLike}
           className="absolute top-2 right-2 cursor-pointer"
         >
-          <div className="bg-black/30 p-2 rounded-full">
+          <div className="bg-black/30 p-2 opacity-85 hover:scale-105 transition rounded-full">
             {!isLiked ? (
               <svg
                 width="30"
@@ -75,10 +84,34 @@ export default function AdSlider({ ad }: AdSliderProps) {
                 />
               </svg>
             )}
+
           </div>
         </button>
-
-        {/* Стрелки */}
+      <button
+        onClick={handleCopyLink}
+        className="absolute top-2 right-15 cursor-pointer"
+      >
+        <div className="bg-black/30 opacity-85 hover:scale-105 transition p-2 rounded-full">
+          <svg
+            className="invert"
+            width="28"
+            height="28"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M11 6C12.6569 6 14 4.65685 14 3C14 1.34315 12.6569 0 11 0C9.34315 0 8 1.34315 8 3C8 3.22371 8.02449 3.44169 8.07092 3.65143L4.86861 5.65287C4.35599 5.24423 3.70652 5 3 5C1.34315 5 0 6.34315 0 8C0 9.65685 1.34315 11 3 11C3.70652 11 4.35599 10.7558 4.86861 10.3471L8.07092 12.3486C8.02449 12.5583 8 12.7763 8 13C8 14.6569 9.34315 16 11 16C12.6569 16 14 14.6569 14 13C14 11.3431 12.6569 10 11 10C10.2935 10 9.644 10.2442 9.13139 10.6529L5.92908 8.65143C5.97551 8.44169 6 8.22371 6 8C6 7.77629 5.97551 7.55831 5.92908 7.34857L9.13139 5.34713C9.644 5.75577 10.2935 6 11 6Z"
+              fill="#000000"
+            />
+          </svg>
+        </div>
+      </button>
+      {copied && (
+        <div className="absolute top-14 right-0 bg-black text-white text-sm px-3 py-1 rounded-lg shadow-lg animate-fade-in-out">
+          Link copied!
+        </div>
+      )}
         {images.length > 1 && (
           <>
             <button
@@ -97,7 +130,6 @@ export default function AdSlider({ ad }: AdSliderProps) {
         )}
       </div>
 
-      {/* Превьюшки */}
       {images.length > 1 && (
         <div className="grid lg:grid-cols-6 grid-cols-4 gap-2 mt-2">
           {images.map((img, idx) => (
@@ -116,7 +148,6 @@ export default function AdSlider({ ad }: AdSliderProps) {
         </div>
       )}
 
-      {/* === FULLSCREEN MODAL === */}
       {isFullscreen && (
         <div className="fixed inset-0 bg-black/90 z-[9999] flex flex-col items-center justify-center">
           <button

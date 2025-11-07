@@ -6,8 +6,8 @@ export const metadata: Metadata = {
   title: "Zamda — Buy & Sell Locally in the USA",
   description: "Zamda is a modern online marketplace for the USA. Buy and sell goods, find jobs, services, vehicles, and real estate in your city. Simple. Fast. Local. Everything will be ZAMDAmazing.",
   icons: {
-    icon: "/zamda-white.png",
-    shortcut: "/zamda-white.png",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
     apple: "/zamda-white.png",
   },
 };
@@ -23,15 +23,6 @@ export default function RootLayout({
         <link
           href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap"
           rel="stylesheet"
-        />
-        <link
-          rel="icon"
-          href="/zamda-white.png"
-          type="image/png"
-        />
-        <link
-          rel="apple-touch-icon"
-          href="/zamda-white.png"
         />
       </head>
       <body className="antialiased bg-white">

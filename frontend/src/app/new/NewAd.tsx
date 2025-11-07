@@ -274,16 +274,16 @@ const handleSubmit = async (e: FormEvent) => {
           <>
             <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
               <p className="font-semibold text-black text-xl">Listing Title</p>
-              <p className="text-gray-700 text-md font-medium">
-                Minimum length 15 symbols
+              <p className="text-gray-700 text-sm font-medium">
+                Minimum length 10 symbols, max. length 30 symbols
               </p>
               <input
                 type="text"
                 placeholder="Enter title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                minLength={15}
-                maxLength={100}
+                minLength={10}
+                maxLength={30}
                 className="p-4 border border-black rounded-3xl h-[44px] mt-1 text-gray-900"
                 required
               />
@@ -291,7 +291,7 @@ const handleSubmit = async (e: FormEvent) => {
 
             <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
               <p className="font-semibold text-black text-xl">Price ($)</p>
-              <p className="text-gray-700 text-md font-medium">
+              <p className="text-gray-700 text-sm font-medium">
                 Enter only final price
               </p>
               <input
@@ -306,8 +306,8 @@ const handleSubmit = async (e: FormEvent) => {
 
             <label className="w-full max-w-md flex-col flex font-semibold text-gray-800">
               <p className="font-semibold text-black text-xl">Description</p>
-              <p className="text-gray-700 text-md font-medium">
-                Minimum length 100 symbols
+              <p className="text-gray-700 text-sm font-medium">
+                Min. length 50, max. length 1500 symbols
               </p>
               <textarea
                 placeholder="Enter description"
@@ -316,8 +316,8 @@ const handleSubmit = async (e: FormEvent) => {
                 className="p-4 border border-black rounded-3xl mt-1 text-gray-900"
                 rows={4}
                 required
-                minLength={100}
-                maxLength={2000}
+                minLength={50}
+                maxLength={1500}
               />
             </label>
 
@@ -326,7 +326,7 @@ const handleSubmit = async (e: FormEvent) => {
             <div>
               <label className="w-full max-w-md flex-col flex font-semibold text-gray-800 relative">
                 <p className="font-semibold text-black text-xl">Location</p>
-                <p className="text-gray-700 text-md font-medium">Your full location for delivery etc.</p>
+                <p className="text-gray-700 text-sm font-medium">Your full location for delivery etc.</p>
 
                 <input
                   type="text"
@@ -370,7 +370,7 @@ const handleSubmit = async (e: FormEvent) => {
             <Link href={'/listings'}>
               <button
                 type="submit"
-                className="bg-black/50 text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition mb-4"
+                className="bg-black/50 invisible text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition mb-4"
               >
                 Back
               </button>
@@ -378,7 +378,7 @@ const handleSubmit = async (e: FormEvent) => {
             
             <button
               type="submit"
-              className="bg-black text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition mb-4"
+              className="cursor-pointer bg-black text-white rounded-3xl px-6 py-2 mt-4 hover:bg-gray-800 transition mb-4"
             >
               Create Ad
             </button>
