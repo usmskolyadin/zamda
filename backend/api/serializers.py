@@ -279,6 +279,11 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = ['id', 'chat', 'sender', 'text', 'created_at', 'is_read']
         read_only_fields = ['sender', 'created_at', 'is_read']
 
+    def create(self, validated_data):
+        request = self.context.get('request')
+        validated_data['sender'] = request.user
+        return super().create(validated_data)
+
 
 class ChatSerializer(serializers.ModelSerializer):
     last_message = serializers.SerializerMethodField()
@@ -286,20 +291,27 @@ class ChatSerializer(serializers.ModelSerializer):
     ad_title = serializers.CharField(source="ad.title", read_only=True)
     buyer = OwnerSerializer(read_only=True)
     seller = OwnerSerializer(read_only=True)
-    
+    unread_count = serializers.SerializerMethodField()  # 👈 добавили
+
     class Meta:
         model = Chat
-        fields = ["id", "ad", "buyer", "ad_title", "seller", "last_message", "created_at", "messages"]
-        read_only_fields = ["buyer", "seller", "created_at"] 
+        fields = [
+            "id", "ad", "buyer", "seller",
+            "ad_title", "last_message",
+            "created_at", "messages", "unread_count"
+        ]
+        read_only_fields = ["buyer", "seller", "created_at"]
 
     def get_last_message(self, obj):
         last = obj.messages.order_by("-created_at").first()
         if not last:
             return None
         return {
-            "text": getattr(last, "text", ""),
-            "created_at": getattr(last, "created_at", None),
+            "text": last.text,
+            "created_at": last.created_at,
         }
+
+
 
 
 class RegisterSerializer(serializers.ModelSerializer):

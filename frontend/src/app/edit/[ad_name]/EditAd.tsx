@@ -305,15 +305,15 @@ export default function EditAd() {
               </MapContainer>
             </div>
 
-            <div className="col-span-2 flex justify-between mt-6">
+            <div className="col-span-2 flex justify-between mt-6 mb-6">
               <Link href="/listings">
                 <button type="button"
-                        className="bg-gray-300 text-black rounded-3xl px-6 py-2 hover:bg-gray-400 transition">
+                        className="cursor-pointer bg-gray-300 text-black rounded-3xl px-6 py-2 hover:bg-gray-400 transition">
                   Cancel
                 </button>
               </Link>
               <button type="submit"
-                      className="bg-black text-white rounded-3xl px-6 py-2 hover:bg-gray-800 transition">
+                      className="cursor-pointer bg-black text-white rounded-3xl px-6 py-2 hover:bg-gray-800 transition">
                 Save Changes
               </button>
             </div>
