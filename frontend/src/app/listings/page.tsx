@@ -7,13 +7,30 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/src/features/context/auth-context";
 import { Advertisement } from "@/src/entities/advertisment/model/types";
 import { apiFetch } from "@/src/shared/api/base";
+import { Profile } from "../profile/[id]/page";
 
 export default function Listings() {
   const [activeTab, setActiveTab] = useState("active");
   const { user } = useAuth();
   const [adsCount, setAdsCount] = useState(0);
   const [ads, setAds] = useState<Advertisement[]>([]);  
+  const profileId = user?.profile.id
+  console.log(`dsaksdakaos ${profileId}`)
+  const [profile, setProfile] = useState()
+  
+  useEffect(() => {
+    if (!profileId) return;
 
+    const fetchProfile = async () => {
+      const res = await apiFetch(`/api/profiles/${profileId}/`);
+      setProfile(res);
+    };
+
+    fetchProfile();
+  }, [profileId]);
+
+
+  console.log(user)
     useEffect(() => {
     if (!user) return;
 
@@ -47,16 +64,20 @@ export default function Listings() {
                         <h2 className="text-gray-800 font-medium  text-md">{user?.username}</h2>
                     </div>
                     <div className="flex items-center text-sm text-gray-700">
-                        <span className="mr-1 text-black text-lg font-bold">{user?.profile.rating}</span>
+                        <span className="mr-1 text-black text-lg font-bold">
+                          {profile?.rating ?? "—"}
+                        </span>
                         <div className="flex text-yellow-400 mr-1">
                         {[...Array(4)].map((_, i) => (
                             <FaStar key={i} />
                         ))}
                         <FaStar className="opacity-50" />
                         </div>
-                        <a href="#" className="text-[#2AAEF7] text-lg ml-1 hover:underline">
-                        {user?.profile.reviews_count} reviews
-                        </a>
+                        <Link className="hover:underline text-[#2AAEF7] " href={`/reviews/${profile?.id ?? 0}`}>
+                          <span className="text-lg ml-1">
+                            {profile?.reviews_count ?? 0} reviews
+                          </span>
+                        </Link> 
                     </div>
                     <div className="lg:hidden block py-4">
                       <Link href={"/new"}>

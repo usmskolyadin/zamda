@@ -17,6 +17,7 @@ export default function ReviewsPage() {
     const fetchProfile = async () => {
       const res = await apiFetch<Profile>(`/api/profiles/${profileId}/`);
       setProfile(res);
+      console.log(res)
     };
 
     fetchProfile();
@@ -92,7 +93,6 @@ export default function ReviewsPage() {
             </div>
           </div>
 
-          {/* Правая часть — список отзывов */}
           <div className="lg:w-3/4 lg:ml-24 h-screen">
             <h1 className="text-black font-bold lg:text-4xl text-3xl py-4">
               Reviews
@@ -107,7 +107,7 @@ export default function ReviewsPage() {
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-semibold text-black">
-                        {review.author_name}
+                        {review.author_lastname} {review.author_firstname}
                       </span>
                       <span className="text-sm text-gray-500">
                         {new Date(review.created_at).toLocaleDateString()}

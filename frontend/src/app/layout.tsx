@@ -6,9 +6,9 @@ export const metadata: Metadata = {
   title: "Zamda — Buy & Sell Locally in the USA",
   description: "Zamda is a modern online marketplace for the USA. Buy and sell goods, find jobs, services, vehicles, and real estate in your city. Simple. Fast. Local. Everything will be ZAMDAmazing.",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/zamda-white.png",
+    icon: "/icons/favicon.ico",
+    shortcut: "/icons/favicon.ico",
+    apple: "/icons/favicon.ico",
   },
 };
 

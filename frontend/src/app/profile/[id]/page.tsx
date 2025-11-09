@@ -18,7 +18,7 @@ export interface Profile {
   city: string;
 }
 
-export default function Listings() {
+export default function Profile() {
   const params = useParams<{ id: string }>();
   const profileId = params?.id;
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -29,7 +29,7 @@ useEffect(() => {
   if (!profileId) return;
 
   const fetchProfile = async () => {
-    const res = await apiFetch<Profile>(`/api/profiles/${profileId}/`);
+    const res = await apiFetch<Profile>(`/api/profiles/${Number(profileId)}/`);
     setProfile(res);
   };
 

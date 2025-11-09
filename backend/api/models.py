@@ -256,3 +256,19 @@ class EmailVerification(models.Model):
 
     def is_expired(self):
         return timezone.now() > self.created_at + timezone.timedelta(minutes=10)
+    
+class Report(models.Model):
+    REASON_CHOICES = [
+        ("spam", "Spam"),
+        ("abuse", "Abuse"),
+        ("other", "Other"),
+    ]
+    reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reports_made")
+    reported_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reports_received")
+    chat = models.ForeignKey("Chat", on_delete=models.CASCADE, null=True, blank=True, related_name="reports")
+    reason = models.CharField(max_length=50, choices=REASON_CHOICES)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.reporter} reported {self.reported_user} ({self.reason})"
