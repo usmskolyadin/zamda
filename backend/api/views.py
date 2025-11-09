@@ -6,7 +6,7 @@ from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .models import AdvertisementLike, AdvertisementView, Category, Chat, Review, SubCategory, ExtraFieldDefinition, Advertisement, Message, UserProfile
 from .serializers import (
-    CategorySerializer, ChatSerializer, MessageSerializer, ProfileSerializer, ReviewSerializer, SubCategorySerializer,
+    CategorySerializer, ChatSerializer, MessageSerializer, ProfileSerializer, ReportSerializer, ReviewSerializer, SubCategorySerializer,
     ExtraFieldDefinitionSerializer, AdvertisementSerializer
 )
 from .permissions import IsOwnerOrReadOnly
@@ -265,7 +265,25 @@ class ChatViewSet(viewsets.ModelViewSet):
         count = unread.count()
         unread.update(is_read=True)
         return Response({"marked_as_read": count})
+    @action(detail=True, methods=["post"], url_path="block")
+    def block_user(self, request, pk=None):
+        chat = self.get_object()
+        # Определяем, кого блокируем
+        blocked_user = chat.buyer if chat.seller == request.user else chat.seller
+        chat.delete()
+        return Response({"detail": f"User {blocked_user.username} blocked and chat deleted"}, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=["post"], url_path="report")
+    def report_user(self, request, pk=None):
+        chat = self.get_object()
+        reported_user = chat.buyer if chat.seller == request.user else chat.seller
+        serializer = ReportSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(reporter=request.user, reported_user=reported_user, chat=chat)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
     permission_classes = [permissions.IsAuthenticated]

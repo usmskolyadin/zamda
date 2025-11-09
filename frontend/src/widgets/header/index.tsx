@@ -63,7 +63,7 @@ export default function Header() {
                     <path d="M2.2928 21.292L2.28337 21.3026C1.97175 21.6227 1.91001 22.1115 2.1337 22.4995C2.35966 22.8914 2.82058 23.0828 3.25769 22.9662L9.05302 21.4208C10.1339 21.7963 11.2942 22 12.5 22C18.299 22 23 17.299 23 11.5C23 5.70101 18.299 1 12.5 1C6.70103 1 2.00002 5.70101 2.00002 11.5C2.00002 13.6029 2.61921 15.5638 3.6852 17.2072C3.65453 17.5251 3.60229 17.8896 3.51944 18.3039C3.28993 19.4515 2.95112 20.2289 2.68837 20.7019C2.55663 20.939 2.44292 21.1015 2.36973 21.1972C2.3331 21.2451 2.30653 21.2764 2.2928 21.292Z" fill="#000000"/>
                   </svg>
                     {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                      <span className="absolute -top-1 right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0 rounded-full">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
                     )}
@@ -104,7 +104,7 @@ export default function Header() {
                 <Link href={"/listings"}>
                   <div className="flex items-center">
                     <h2 className="mr-2 font-semibold text-white ml-2 w-36 text-right">{user?.first_name} </h2>
-                    <img className="rounded-full border border-gray-200 w-10 h-10 bg-white"  src={user.profile?.avatar} width={40} height={40} alt={""} />
+                    <img className="rounded-full border border-gray-200 max-w-10 max-h-10 min-w-10 min-h-10 bg-white"  src={user.profile?.avatar} width={40} height={40} alt={""} />
                   </div>
                 </Link>
                 ) : (

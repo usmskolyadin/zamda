@@ -51,7 +51,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }
 
   useEffect(() => {
-    // важно: делаем проверку окружения
     if (typeof window === 'undefined') return;
 
     const token = localStorage.getItem('access_token');
