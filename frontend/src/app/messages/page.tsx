@@ -97,9 +97,11 @@ if (loading) {
                         ))}
                         <FaStar className="opacity-50" />
                         </div>
-                        <a href="#" className="text-[#2AAEF7] text-lg ml-1 hover:underline">
-                        {user?.profile.reviews_count} reviews
-                        </a>
+                        <Link className="hover:underline text-[#2AAEF7] " href={`/reviews/${user?.profile?.id ?? 0}`}>
+                          <span className="text-lg ml-1">
+                            {user?.profile?.reviews_count ?? 0} reviews
+                          </span>
+                        </Link> 
                     </div>
                     <div className="lg:hidden block py-4">
                       <Link href={"/new"}>

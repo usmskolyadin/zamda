@@ -7,14 +7,31 @@ from .models import (
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
+from .models import Report
 
+class ReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Report
+        fields = ["id", "reporter", "reported_user", "chat", "reason", "description", "created_at"]
+        read_only_fields = ["reporter", "created_at"]
+        
 class ReviewSerializer(serializers.ModelSerializer):
-    author_name = serializers.CharField(source='author.username', read_only=True)
+    author_lastname = serializers.CharField(source='author.last_name', read_only=True)
+    author_firstname = serializers.CharField(source='author.first_name', read_only=True)
 
     class Meta:
         model = Review
-        fields = ['id', 'profile', 'author', 'author_name', 'rating', 'comment', 'created_at']
-        read_only_fields = ['author', 'created_at', 'author_name']
+        fields = ['id', 'profile', 'author', 'author_lastname', 'author_firstname', 'rating', 'comment', 'created_at']
+        read_only_fields = ['author', 'created_at', 'author_lastname', 'author_firstname']
+
+    def validate(self, data):
+        request = self.context.get('request')
+        user = request.user if request else None
+        profile = data.get('profile')
+
+        if user and Review.objects.filter(profile=profile, author=user).exists():
+            raise serializers.ValidationError("Вы уже оставляли отзыв для этого пользователя.")
+        return data
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -291,7 +308,7 @@ class ChatSerializer(serializers.ModelSerializer):
     ad_title = serializers.CharField(source="ad.title", read_only=True)
     buyer = OwnerSerializer(read_only=True)
     seller = OwnerSerializer(read_only=True)
-    unread_count = serializers.SerializerMethodField()  # 👈 добавили
+    unread_count = serializers.SerializerMethodField()  # 👈
 
     class Meta:
         model = Chat
@@ -311,6 +328,14 @@ class ChatSerializer(serializers.ModelSerializer):
             "created_at": last.created_at,
         }
 
+    # 👇 добавляем метод
+    def get_unread_count(self, obj):
+        # Пример: считаем все сообщения, которые не прочитал текущий пользователь
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return 0
+
+        return obj.messages.filter(is_read=False).exclude(sender=request.user).count()
 
 
 
