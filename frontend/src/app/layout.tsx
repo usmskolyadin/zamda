@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Zamda — Buy & Sell Locally in the USA",
@@ -20,6 +21,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-VZ99K3MCQN"
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-VZ99K3MCQN');
+          `}
+        </Script>
         <link
           href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap"
           rel="stylesheet"

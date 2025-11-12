@@ -84,7 +84,7 @@ export default async function AdsBySubcategory({ params }: Props) {
                             alt={ad.title}
                             width={200}
                             height={150}
-                            className="rounded-xl object-cover w-full"
+                            className="rounded-xl object-cover w-full max-h-40"
                           />
                           <div className="absolute top-2 right-2  bg-black/30 p-2 rounded-full">
                             <svg width="24" height="24" className="invert" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -96,7 +96,7 @@ export default async function AdsBySubcategory({ params }: Props) {
                           {ad.images.slice(0, 2).map((img) => (
                             <img
                               key={img.id}
-                              className="rounded-2xl w-1/2 object-cover"
+                              className="rounded-2xl max-h-24 w-1/2 object-cover"
                               src={img.image}
                               width={900}
                               height={600}
@@ -118,7 +118,7 @@ export default async function AdsBySubcategory({ params }: Props) {
                           <p className="text-black font-semibold lg:text-lg text-xl">
                             ${ad.price}
                           </p>
-                          <p className="text-gray-600  break-words overflow-hidden line-clamp-3 leading-snug">
+                          <p className="text-gray-900 font-medium  break-words overflow-hidden line-clamp-3 leading-snug">
                             {ad.description.length > 200
                               ? ad.description.slice(0, 200) + "..."
                               : ad.description}
@@ -126,7 +126,10 @@ export default async function AdsBySubcategory({ params }: Props) {
                         </div>
                         </Link>
 
-                        <div className="flex items-center mt-2 text-gray-500">
+                        <div className="flex items-center mt-2 font-medium text-gray-800">
+                          <svg className="mr-1" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4.03125 8.91703L19.5079 4.58356C19.8834 4.47843 20.2293 4.8244 20.1242 5.19986L15.7907 20.6765C15.6641 21.1286 15.0406 21.1728 14.8516 20.7431L11.6033 13.3607C11.553 13.2462 11.4615 13.1548 11.347 13.1044L3.9647 9.85617C3.535 9.66711 3.57919 9.04361 4.03125 8.91703Z" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
                           <span>{ad.location}</span>
                         </div>
                         <div className="max-w-[712px]">

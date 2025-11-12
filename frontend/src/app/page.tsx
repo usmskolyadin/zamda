@@ -50,7 +50,6 @@ export default async function Home() {
           </div>
         </div>
       </section>
-
       <section className="bg-[#E5E9F2] p-4">
         <div className="max-w-screen-xl mx-auto">
           <div className="w-full flex flex-col items-center justify-center">

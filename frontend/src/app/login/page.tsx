@@ -120,7 +120,7 @@ export default function Login() {
               </p>
               <button
                 type="submit"
-                className="mt-3 bg-black w-[120px] mx-auto h-[44px] rounded-3xl flex justify-center items-center text-white"
+                className="cursor-pointer mt-3 bg-black w-[120px] mx-auto h-[44px] rounded-3xl flex justify-center items-center text-white"
               >
                 Login
               </button>

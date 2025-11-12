@@ -8,13 +8,16 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from .models import Report
+from backend.storages import MediaStorage
+media_storage = MediaStorage()
+
 
 class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
         fields = ["id", "reporter", "reported_user", "chat", "reason", "description", "created_at"]
         read_only_fields = ["reporter", "created_at"]
-        
+
 class ReviewSerializer(serializers.ModelSerializer):
     author_lastname = serializers.CharField(source='author.last_name', read_only=True)
     author_firstname = serializers.CharField(source='author.first_name', read_only=True)
@@ -249,7 +252,8 @@ class AdvertisementSerializer(serializers.ModelSerializer):
             )
 
         for f in files:
-            AdvertisementImage.objects.create(ad=ad, image=f)
+            filename = media_storage.save(f"advertisements/{f.name}", f)
+            AdvertisementImage.objects.create(ad=ad, image=filename)
 
         return ad
 

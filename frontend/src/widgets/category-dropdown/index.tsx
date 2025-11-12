@@ -2,11 +2,12 @@
 
 import { getCategories } from "@/src/entities/category/api/get-categories";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function CategoryDropdown() {
   const [open, setOpen] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
+  const closeTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -20,13 +21,27 @@ export default function CategoryDropdown() {
     load();
   }, []);
 
+  const handleMouseEnter = () => {
+    // Отменяем возможное закрытие
+    if (closeTimeout.current) clearTimeout(closeTimeout.current);
+    setOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    // Даем пользователю время перевести курсор
+    closeTimeout.current = setTimeout(() => setOpen(false), 250);
+  };
+
   return (
-    <div className="relative inline-block">
+    <div
+      className="relative inline-block"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <button
         type="button"
-        onClick={() => setOpen((prev) => !prev)}
-        className={`rounded-3xl cursor-pointer hover:bg-[#E5E9F2] p-4 lg:h-[44px] h-[40px] w-[188px] hover:text-black flex justify-center items-center transition-colors duration-200
-          ${open ? "bg-[#E5E9F2] text-black" : "bg-black text-white hover:text-black"}`}
+        className={`rounded-3xl cursor-pointer p-4 lg:h-[44px] h-[40px] w-[188px] flex justify-center items-center transition-colors duration-200
+          ${open ? "bg-[#E5E9F2] text-black" : "bg-black text-white hover:bg-[#E5E9F2] hover:text-black"}`}
       >
         <span className={open ? "text-black" : "hover:text-black"}>All categories</span>
         <svg
@@ -45,7 +60,7 @@ export default function CategoryDropdown() {
       </button>
 
       {open && (
-        <div className="absolute left-0 mt-2 w-[188px] bg-white rounded-3xl shadow-lg p-4 z-10">
+        <div className="absolute left-0 mt-2 w-[188px] bg-white rounded-3xl shadow-lg p-4 z-10 transition-opacity duration-200">
           <ul className="space-y-2">
             {categories.map((category, index) => (
               <li

@@ -5,12 +5,13 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.text import slugify
+from backend.storages import MediaStorage
 
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True)
-    image = models.ImageField(upload_to="categories/", blank=True, null=True)
+    image = models.ImageField(upload_to="categories/", blank=True, null=True, storage=MediaStorage())
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -29,7 +30,7 @@ class SubCategory(models.Model):
     category = models.ForeignKey(Category, related_name="subcategories", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     slug = models.SlugField()
-    image = models.ImageField(upload_to="categories/", blank=True, null=True)
+    image = models.ImageField(upload_to="categories/", blank=True, null=True, storage=MediaStorage())
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -147,7 +148,7 @@ class AdvertisementExtraField(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, default="/profile.png")
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, default="/profile.png", storage=MediaStorage())
     city = models.CharField(max_length=100, blank=True)
     # reviews = models.ManyToManyField(Review, blank=True)
 
